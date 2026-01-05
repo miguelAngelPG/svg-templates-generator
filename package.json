@@ -9,12 +9,20 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^143.0.4",
+    "@vercel/og": "^0.8.6",
+    "canvas": "^3.2.0",
+    "gif-encoder-2": "^1.0.5",
     "next": "16.1.1",
+    "puppeteer-core": "^24.34.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "satori": "^0.18.3",
+    "satori-html": "^0.3.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/gifencoder": "^2.0.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

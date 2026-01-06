@@ -26,7 +26,23 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ margin: 0, background: '#050505', color: '#fff' }}
       >
+        <nav style={{
+          borderBottom: '1px solid #333',
+          padding: '15px 40px',
+          display: 'flex',
+          gap: '20px',
+          background: 'rgba(0,0,0,0.8)',
+          backdropFilter: 'blur(10px)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
+        }}>
+          <a href="/" style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}>🏠 Home</a>
+          <a href="/generator" style={{ color: '#aaa', textDecoration: 'none' }}>GIF Generator</a>
+          <a href="/templates" style={{ color: '#aaa', textDecoration: 'none' }}>SVG Templates</a>
+        </nav>
         {children}
       </body>
     </html>

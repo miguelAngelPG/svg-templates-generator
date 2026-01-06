@@ -1,9 +1,13 @@
 import { NextRequest } from 'next/server';
 import satori from 'satori';
+import React from 'react';
 
 export async function GET(request: NextRequest) {
     try {
+        console.log('API Hit: /api/custom/advanced');
         const searchParams = request.nextUrl.searchParams;
+        const params = Object.fromEntries(searchParams.entries());
+        console.log('Params:', params);
 
         // Parámetros
         const content = searchParams.get('content') || 'Hello World';
@@ -13,6 +17,8 @@ export async function GET(request: NextRequest) {
         const height = parseInt(searchParams.get('height') || '400');
         const theme = searchParams.get('theme') || 'dark';
         const layout = searchParams.get('layout') || 'center'; // center, left, card
+
+        console.log('Parsed config:', { width, height, theme, layout });
 
         // Colores personalizables
         const bgColor = searchParams.get('bg') || '';
@@ -221,6 +227,7 @@ export async function GET(request: NextRequest) {
             </div>
         );
 
+        console.log('Fetching fonts...');
         // Convertir a SVG
         const svg = await satori(jsx, {
             width,
@@ -228,24 +235,25 @@ export async function GET(request: NextRequest) {
             fonts: [
                 {
                     name: 'Inter',
-                    data: await fetch('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff').then(res => res.arrayBuffer()),
+                    data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-400-normal.woff').then(res => res.arrayBuffer()),
                     weight: 400,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: await fetch('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff').then(res => res.arrayBuffer()),
+                    data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-600-normal.woff').then(res => res.arrayBuffer()),
                     weight: 600,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: await fetch('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff').then(res => res.arrayBuffer()),
+                    data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-700-normal.woff').then(res => res.arrayBuffer()),
                     weight: 700,
                     style: 'normal',
                 },
             ],
         });
+        console.log('SVG Generated successfully');
 
         return new Response(svg, {
             headers: {

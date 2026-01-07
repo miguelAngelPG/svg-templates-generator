@@ -18,7 +18,10 @@ export default function GifGeneratorPage() {
     const [fps, setFps] = useState(30);
     const [bg, setBg] = useState('#050505');
 
-    const [loading, setLoading] = useState(false);
+    const [loadingSvg, setLoadingSvg] = useState(false);
+    const [loadingGif, setLoadingGif] = useState(false);
+
+    // Only used for global errors or GIF results
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState('');
 
@@ -27,22 +30,38 @@ export default function GifGeneratorPage() {
     const [advancedUrl, setAdvancedUrl] = useState('');
     const [basicUrl, setBasicUrl] = useState('');
 
-    const handleGenerate = async () => {
-        setLoading(true);
+    const handleGenerateSvg = async () => {
+        setLoadingSvg(true);
         setError('');
-        setResult(null);
 
-        // 1. Generate XML/SVG URLs IMMEDIATELY (Don't wait for GIF)
         try {
-            const textContent = extractTextFromHtml(html);
-            const svgParams = new URLSearchParams({
-                html,
-                css,
-                width: width.toString(),
-                height: height.toString(),
-                bg
+            // 1. Generate SVG via POST
+            const response = await fetch('/api/custom/html', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    html,
+                    css,
+                    width,
+                    height,
+                    bg
+                })
             });
-            setSvgUrl(`/api/custom/html?${svgParams.toString()}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("🚀 ~ handleGenerateSvg ~ data:", data)
+                if (data.svg) {
+                    const blob = new Blob([data.svg], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    setSvgUrl(url);
+                }
+            } else {
+                console.error("Failed to generate SVG preview");
+                setError('Failed to generate SVG preview');
+            }
+
+            const textContent = extractTextFromHtml(html);
 
             // Advanced Proposal
             const advancedParams = new URLSearchParams({
@@ -64,12 +83,21 @@ export default function GifGeneratorPage() {
                 theme: 'light'
             });
             setBasicUrl(`/api/custom/basic?${basicParams.toString()}`);
+
         } catch (e) {
             console.error("Error generating SVG URLs", e);
+            setError('Error generating SVG');
+        } finally {
+            setLoadingSvg(false);
         }
+    };
+
+    const handleGenerateGif = async () => {
+        setLoadingGif(true);
+        setError('');
+        setResult(null);
 
         try {
-            // 2. Generate GIF (Long process)
             const response = await fetch('/api/generate-gif', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -86,7 +114,7 @@ export default function GifGeneratorPage() {
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to generate GIF');
         } finally {
-            setLoading(false);
+            setLoadingGif(false);
         }
     };
 
@@ -164,23 +192,45 @@ export default function GifGeneratorPage() {
                             <input type="text" value={bg} onChange={(e) => setBg(e.target.value)} placeholder="#050505" style={{ width: '100%', background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '10px', color: 'white' }} />
                         </label>
 
-                        <button
-                            onClick={handleGenerate}
-                            disabled={loading}
-                            style={{
-                                width: '100%',
-                                background: loading ? '#333' : 'linear-gradient(135deg, #4316db, #00d4ff)',
-                                border: 'none',
-                                borderRadius: '8px',
-                                padding: '15px',
-                                color: 'white',
-                                fontSize: '16px',
-                                fontWeight: 'bold',
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                            }}
-                        >
-                            {loading ? '⏳ Generating... (20-30s)' : '🚀 Generate Assets'}
-                        </button>
+                        <div style={{ display: 'flex', gap: '15px' }}>
+                            <button
+                                onClick={handleGenerateSvg}
+                                disabled={loadingSvg}
+                                style={{
+                                    flex: 1,
+                                    background: loadingSvg ? '#333' : 'linear-gradient(135deg, #FF6B6B, #556270)',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '15px',
+                                    color: 'white',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    cursor: loadingSvg ? 'not-allowed' : 'pointer',
+                                    opacity: loadingSvg ? 0.7 : 1,
+                                }}
+                            >
+                                {loadingSvg ? '🖌️ Generating SVG...' : '✨ Create SVG Preview'}
+                            </button>
+
+                            <button
+                                onClick={handleGenerateGif}
+                                disabled={loadingGif}
+                                style={{
+                                    flex: 1,
+                                    background: loadingGif ? '#333' : 'linear-gradient(135deg, #4316db, #00d4ff)',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '15px',
+                                    color: 'white',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    cursor: loadingGif ? 'not-allowed' : 'pointer',
+                                    opacity: loadingGif ? 0.7 : 1,
+                                }}
+                            >
+                                {loadingGif ? '⏳ Generating GIF... (30s)' : '🎥 Create Animated GIF'}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Right: Result */}
@@ -197,7 +247,7 @@ export default function GifGeneratorPage() {
                         <div>
                             <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>🎥 Animated GIF</h2>
 
-                            {loading && !result ? (
+                            {loadingGif && !result ? (
                                 <div style={{
                                     background: '#1a1a1a',
                                     border: '1px dashed #333',
@@ -223,6 +273,7 @@ export default function GifGeneratorPage() {
                                     <p style={{ fontSize: '12px', opacity: 0.5 }}>This can take up to 30 seconds</p>
                                 </div>
                             ) : result ? (
+                                /* ... result block ... */
                                 <div>
                                     <div style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '20px', marginBottom: '20px' }}>
                                         <img src={result.url} alt="Generated GIF" style={{ width: '100%', borderRadius: '8px' }} />
@@ -259,20 +310,27 @@ export default function GifGeneratorPage() {
                                     <div style={{ display: 'flex', gap: '15px' }}>
                                         <a href={svgUrl} target="_blank" rel="noreferrer" style={{ color: '#00d4ff', fontSize: '14px', textDecoration: 'none' }}>⬇️ Open SVG</a>
                                         <button
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(`<img src="${window.location.origin}${svgUrl}" alt="Generated SVG" />`);
-                                                alert('Copied to clipboard!');
+                                            onClick={async () => {
+                                                try {
+                                                    const res = await fetch(svgUrl);
+                                                    const text = await res.text();
+                                                    navigator.clipboard.writeText(text);
+                                                    alert('SVG Code copied to clipboard!');
+                                                } catch (e) {
+                                                    console.error("Failed to copy SVG", e);
+                                                    alert('Failed to copy SVG code');
+                                                }
                                             }}
                                             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: '14px' }}
                                         >
-                                            📋 Copy Markdown
+                                            📋 Copy SVG Code
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {!result && !error && !loading && (
+                        {!result && !error && !loadingSvg && !loadingGif && (
                             <div style={{ background: '#1a1a1a', border: '1px dashed #333', borderRadius: '8px', padding: '60px 20px', textAlign: 'center' }}>
                                 <p style={{ color: '#666', fontSize: '14px' }}>Assets will appear here</p>
                             </div>

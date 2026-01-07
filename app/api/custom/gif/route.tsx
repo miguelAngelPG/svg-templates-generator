@@ -3,6 +3,7 @@ import puppeteer, { Browser, Page } from 'puppeteer-core';
 // @ts-ignore
 import GIFEncoder from 'gif-encoder-2';
 import { createCanvas, loadImage } from 'canvas';
+import chromium from '@sparticuz/chromium';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -11,10 +12,9 @@ const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function getChromium() {
   if (process.env.VERCEL) {
-    const chromium = await import('@sparticuz/chromium-min');
     return {
-      args: chromium.default.args,
-      executablePath: await chromium.default.executablePath(
+      args: chromium.args,
+      executablePath: await chromium.executablePath(
         'https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar'
       ),
     };
@@ -36,22 +36,13 @@ async function getChromium() {
   };
 }
 
-export async function GET(request: NextRequest) {
+async function generateGif(params: { html: string, css: string, width: number, height: number, duration: number, fps: number, bg: string }) {
   let browser: Browser | null = null;
+  const { html, css, width, height, duration, fps, bg } = params;
 
   try {
-    const searchParams = request.nextUrl.searchParams;
-
-    const html = searchParams.get('html') || '<div style="color: white; font-size: 48px; text-align: center; padding-top: 150px;">Hello World</div>';
-    const css = searchParams.get('css') || '';
-    const width = parseInt(searchParams.get('width') || '800');
-    const height = parseInt(searchParams.get('height') || '400');
-    const duration = parseInt(searchParams.get('duration') || '3');
-    const fps = parseInt(searchParams.get('fps') || '30');
-    const bg = searchParams.get('bg') || '#050505';
-
     const totalFrames = duration * fps;
-    const frameDuration = duration * 1000; // duración total en ms
+    const frameDuration = duration * 1000;
 
     const fullHtml = `
 <!DOCTYPE html>
@@ -59,20 +50,8 @@ export async function GET(request: NextRequest) {
 <head>
   <meta charset="UTF-8">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      width: ${width}px;
-      height: ${height}px;
-      background: ${bg};
-      overflow: hidden;
-      font-family: 'Inter', sans-serif;
-    }
-    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: ${width}px; height: ${height}px; background: ${bg}; overflow: hidden; font-family: 'Inter', sans-serif; }
     ${css}
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -80,8 +59,7 @@ export async function GET(request: NextRequest) {
 <body>
   ${html}
 </body>
-</html>
-    `;
+</html>`;
 
     console.log('🚀 Iniciando generación de GIF...');
     const chromiumConfig = await getChromium();
@@ -96,90 +74,58 @@ export async function GET(request: NextRequest) {
     const page: Page = await browser.newPage();
     await page.setViewport({ width, height });
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
-
-    // Esperar que la página cargue completamente
     await wait(1000);
 
-    console.log('🎬 Pausando animaciones para control manual...');
-
-    // CLAVE: Pausar todas las animaciones y controlarlas manualmente
+    console.log('🎬 Pausando animaciones...');
     await page.evaluate(() => {
       const style = document.createElement('style');
-      style.innerHTML = `
-        * {
-          animation-play-state: paused !important;
-        }
-      `;
+      style.innerHTML = `* { animation-play-state: paused !important; }`;
       document.head.appendChild(style);
-
-      // Forzar pausa
       document.querySelectorAll('*').forEach((el: any) => {
         const computed = window.getComputedStyle(el);
-        if (computed.animationName !== 'none') {
-          el.style.animationPlayState = 'paused';
-        }
+        if (computed.animationName !== 'none') el.style.animationPlayState = 'paused';
       });
     });
 
     const encoder = new GIFEncoder(width, height);
-
     encoder.setDelay(1000 / fps);
     encoder.setRepeat(0);
     encoder.setQuality(10);
-
     encoder.start();
 
     console.log(`📸 Capturando ${totalFrames} frames @ ${fps}fps`);
 
-    // Capturar cada frame manipulando el tiempo de animación
     for (let i = 0; i < totalFrames; i++) {
-      const progress = i / (totalFrames - 1); // 0 a 1
+      const progress = i / (totalFrames - 1);
       const timeMs = progress * frameDuration;
 
-      // CLAVE: Manipular el tiempo de animación directamente
       await page.evaluate((time) => {
         document.querySelectorAll('*').forEach((el: any) => {
           const computed = window.getComputedStyle(el);
           if (computed.animationName !== 'none') {
-            // Establecer el delay negativo para "avanzar" la animación
             el.style.animationDelay = `-${time}ms`;
             el.style.animationPlayState = 'paused';
           }
         });
       }, timeMs);
 
-      // Dar tiempo al navegador para renderizar
       await wait(50);
 
-      // Capturar screenshot
-      const screenshotBuffer = await page.screenshot({
-        type: 'png',
-        clip: { x: 0, y: 0, width, height },
-      });
-
-      const screenshot = Buffer.from(screenshotBuffer);
-      const img = await loadImage(screenshot);
-
+      const screenshotBuffer = await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width, height } });
+      const img = await loadImage(Buffer.from(screenshotBuffer));
       const canvas = createCanvas(width, height);
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
+      encoder.addFrame(ctx.getImageData(0, 0, width, height).data);
 
-      const imageData = ctx.getImageData(0, 0, width, height);
-      encoder.addFrame(imageData.data);
-
-      if (i % 10 === 0) {
-        console.log(`📸 Frame ${i + 1}/${totalFrames} (${(progress * 100).toFixed(1)}% - ${timeMs.toFixed(0)}ms)`);
-      }
+      if (i % 10 === 0) console.log(`📸 Frame ${i + 1}/${totalFrames}`);
     }
 
-    console.log('✨ Finalizando encoder...');
     encoder.finish();
     await browser.close();
 
     const gifBuffer = encoder.out.getData();
-    const sizeKB = (gifBuffer.length / 1024).toFixed(2);
-
-    console.log(`✅ GIF generado: ${sizeKB} KB`);
+    console.log(`✅ GIF generado: ${(gifBuffer.length / 1024).toFixed(2)} KB`);
 
     return new Response(gifBuffer, {
       headers: {
@@ -191,27 +137,39 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Error:', error);
-
     if (browser) await browser.close();
 
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-    const errorSvg = `<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="400" fill="#1a1a1a"/>
-  <text x="400" y="160" text-anchor="middle" fill="#ff4444" font-size="24" font-weight="bold">
-    Error generating GIF
-  </text>
-  <text x="400" y="200" text-anchor="middle" fill="#ffffff" font-size="14">
-    ${errorMessage.substring(0, 80)}
-  </text>
-  <text x="400" y="230" text-anchor="middle" fill="#888888" font-size="12">
-    ${process.env.VERCEL ? 'Vercel' : 'Local'} - Check logs
-  </text>
-</svg>`;
-
-    return new Response(errorSvg, {
+    // Return error SVG
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><rect width="100%" height="100%" fill="#333"/><text x="50%" y="50%" fill="red" text-anchor="middle">${msg}</text></svg>`, {
       status: 500,
-      headers: { 'Content-Type': 'image/svg+xml' },
+      headers: { 'Content-Type': 'image/svg+xml' }
     });
   }
+}
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  return generateGif({
+    html: searchParams.get('html') || '<div>Hello</div>',
+    css: searchParams.get('css') || '',
+    width: parseInt(searchParams.get('width') || '800'),
+    height: parseInt(searchParams.get('height') || '400'),
+    duration: parseInt(searchParams.get('duration') || '3'),
+    fps: parseInt(searchParams.get('fps') || '30'),
+    bg: searchParams.get('bg') || '#050505'
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  return generateGif({
+    html: body.html || '<div>Hello</div>',
+    css: body.css || '',
+    width: parseInt(body.width || '800'),
+    height: parseInt(body.height || '400'),
+    duration: parseInt(body.duration || '3'),
+    fps: parseInt(body.fps || '30'),
+    bg: body.bg || '#050505'
+  });
 }

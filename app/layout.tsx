@@ -41,6 +41,7 @@ export default function RootLayout({
         }}>
           <a href="/" style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}>🏠 Home</a>
           <a href="/generator" style={{ color: '#aaa', textDecoration: 'none' }}>GIF Generator</a>
+          <a href="/gif-studio" style={{ color: '#aaa', textDecoration: 'none' }}>GIF Studio</a>
           <a href="/templates" style={{ color: '#aaa', textDecoration: 'none' }}>SVG Templates</a>
         </nav>
         {children}

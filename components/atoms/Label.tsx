@@ -1,0 +1,14 @@
+import React from 'react';
+
+interface LabelProps {
+    children: React.ReactNode;
+    className?: string;
+}
+
+export function Label({ children, className = '' }: LabelProps) {
+    return (
+        <label className={`block text-xs text-gray-500 font-mono mb-1 ${className}`}>
+            {children}
+        </label>
+    );
+}

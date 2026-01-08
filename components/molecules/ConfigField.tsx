@@ -8,9 +8,10 @@ interface ConfigFieldProps {
     onChange: (val: any) => void;
     type?: 'text' | 'number' | 'color';
     suffix?: React.ReactNode;
+    maxLength?: number;
 }
 
-export function ConfigField({ label, value, onChange, type = 'text', suffix }: ConfigFieldProps) {
+export function ConfigField({ label, value, onChange, type = 'text', suffix, maxLength }: ConfigFieldProps) {
     return (
         <div className="">
             <Label>{label}</Label>
@@ -20,6 +21,7 @@ export function ConfigField({ label, value, onChange, type = 'text', suffix }: C
                     value={value}
                     onChange={(e) => onChange(type === 'number' ? Number(e.target.value) : e.target.value)}
                     fullWidth
+                    maxLength={maxLength}
                 />
                 {suffix && <span className="text-gray-600 text-sm">{suffix}</span>}
             </div>

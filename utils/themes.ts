@@ -34,6 +34,19 @@ export const HERO_THEMES: Record<string, ThemeColors> = {
     },
 };
 
-export function getTheme(themeName: string): ThemeColors {
-    return HERO_THEMES[themeName] || HERO_THEMES['purple-cyan'];
+export function getTheme(themeName: string, customColor?: string): ThemeColors {
+    const baseTheme = HERO_THEMES[themeName] || HERO_THEMES['purple-cyan'];
+
+    if (themeName === 'custom' && customColor) {
+        return {
+            bg: '#0a0a0a',
+            bgGradient: 'linear-gradient(135deg, #0a0a0a 0%, #000 100%)',
+            accent: customColor,
+            gradient: `linear-gradient(to right, ${customColor}, #ffffff)`,
+            blob1: customColor,
+            blob2: `${customColor}80` // slightly transparent variation
+        };
+    }
+
+    return baseTheme;
 }

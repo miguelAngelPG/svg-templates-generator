@@ -18,8 +18,9 @@ export async function GET(request: NextRequest) {
     const location = searchParams.get('location') || 'Mexico';
     const style = searchParams.get('style') || 'modern'; // modern | minimal | cyber
     const themeName = searchParams.get('theme') || 'purple-cyan';
+    const customColor = searchParams.get('customColor') || undefined;
 
-    const theme = getTheme(themeName);
+    const theme = getTheme(themeName, customColor);
     const fonts = await getFonts();
 
     // RENDER LOGIC

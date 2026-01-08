@@ -13,7 +13,10 @@ export const MinimalTemplate = ({ name, title, subtitle, location, theme: c }: T
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: c.bg, fontFamily: 'Inter', padding: '60px', color: '#fff' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             {/* NOW COLORFUL: Name uses Theme Accent */}
-            <h1 style={{ fontSize: '72px', fontWeight: 900, lineHeight: 0.9, letterSpacing: '-2px', textTransform: 'uppercase', maxWidth: '600px', color: c.accent }}>{name}</h1>
+            <h1 style={{
+                fontSize: name.length > 12 ? '48px' : '72px',
+                fontWeight: 900, lineHeight: 0.9, letterSpacing: '-2px', textTransform: 'uppercase', maxWidth: '600px', color: c.accent
+            }}>{name}</h1>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', border: `2px solid ${c.accent}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', color: c.accent }}>👋</div>
         </div>
 

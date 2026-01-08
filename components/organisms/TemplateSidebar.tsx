@@ -86,10 +86,10 @@ export function TemplateSidebar({
 
                 {selectedTemplate === 'hero' && (
                     <>
-                        <ConfigField label="Name" value={heroParams.name} onChange={v => setHeroParams({ ...heroParams, name: v })} />
-                        <ConfigField label="Title" value={heroParams.title} onChange={v => setHeroParams({ ...heroParams, title: v })} />
-                        <ConfigField label="Subtitle" value={heroParams.subtitle} onChange={v => setHeroParams({ ...heroParams, subtitle: v })} />
-                        <ConfigField label="Location" value={heroParams.location} onChange={v => setHeroParams({ ...heroParams, location: v })} />
+                        <ConfigField label="Name" value={heroParams.name} onChange={v => setHeroParams({ ...heroParams, name: v })} maxLength={20} />
+                        <ConfigField label="Title" value={heroParams.title} onChange={v => setHeroParams({ ...heroParams, title: v })} maxLength={30} />
+                        <ConfigField label="Subtitle" value={heroParams.subtitle} onChange={v => setHeroParams({ ...heroParams, subtitle: v })} maxLength={40} />
+                        <ConfigField label="Location" value={heroParams.location} onChange={v => setHeroParams({ ...heroParams, location: v })} maxLength={20} />
 
 
                         <div className="grid grid-cols-2 gap-2">
@@ -107,9 +107,31 @@ export function TemplateSidebar({
                                     <option value="purple-cyan">Purple & Cyan</option>
                                     <option value="orange-pink">Orange & Pink</option>
                                     <option value="green-blue">Green & Blue</option>
+                                    <option value="custom">Custom Color</option>
                                 </Select>
                             </div>
                         </div>
+
+                        {heroParams.theme === 'custom' && (
+                            <div>
+                                <Label>Accent Color</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="color"
+                                        value={heroParams.customColor}
+                                        onChange={e => setHeroParams({ ...heroParams, customColor: e.target.value })}
+                                        className="w-10 h-10 p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        type="text"
+                                        value={heroParams.customColor}
+                                        onChange={e => setHeroParams({ ...heroParams, customColor: e.target.value })}
+                                        fullWidth
+                                        maxLength={7}
+                                    />
+                                </div>
+                            </div>
+                        )}
 
 
                     </>

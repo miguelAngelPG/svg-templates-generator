@@ -18,8 +18,8 @@ export interface HeroParams {
     subtitle: string;
     location: string;
     theme: string;
-
     style: string;
+    customColor?: string;
 }
 
 export interface UltraParams {
@@ -55,7 +55,8 @@ export function useTemplateGenerator() {
         location: 'Hidalgo, MX',
         theme: 'purple-cyan',
 
-        style: 'modern'
+        style: 'modern',
+        customColor: '#00f2ff'
     });
 
     const [ultraParams, setUltraParams] = useState<UltraParams>({

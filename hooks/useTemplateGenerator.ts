@@ -19,6 +19,7 @@ export interface HeroParams {
     location: string;
     theme: string;
     lang: string;
+    style: string;
 }
 
 export interface UltraParams {
@@ -53,7 +54,8 @@ export function useTemplateGenerator() {
         subtitle: 'Human first, Engineer second',
         location: 'Hidalgo, MX',
         theme: 'purple-cyan',
-        lang: 'en'
+        lang: 'en',
+        style: 'modern'
     });
 
     const [ultraParams, setUltraParams] = useState<UltraParams>({
@@ -75,13 +77,13 @@ export function useTemplateGenerator() {
 
             if (selectedTemplate === 'advanced') {
                 params = new URLSearchParams(advancedParams as any);
-                url = `/api/custom/advanced?${params.toString()}`;
+                url = `/api/custom/advanced?${params.toString()}&t=${Date.now()}`;
             } else if (selectedTemplate === 'hero') {
                 params = new URLSearchParams(heroParams as any);
-                url = `/api/templates/hero?${params.toString()}`;
+                url = `/api/templates/hero?${params.toString()}&t=${Date.now()}`;
             } else if (selectedTemplate === 'ultra') {
                 params = new URLSearchParams(ultraParams as any);
-                url = `/api/custom/ultra?${params.toString()}`;
+                url = `/api/custom/ultra?${params.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);

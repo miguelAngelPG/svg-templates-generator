@@ -91,7 +91,16 @@ export function TemplateSidebar({
                         <ConfigField label="Subtitle" value={heroParams.subtitle} onChange={v => setHeroParams({ ...heroParams, subtitle: v })} />
                         <ConfigField label="Location" value={heroParams.location} onChange={v => setHeroParams({ ...heroParams, location: v })} />
 
+
                         <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <Label>Style</Label>
+                                <Select value={heroParams.style} onChange={e => setHeroParams({ ...heroParams, style: e.target.value })} fullWidth>
+                                    <option value="modern">Modern (Glass)</option>
+                                    <option value="minimal">Minimal (B&W)</option>
+                                    <option value="cyber">Cyber (Tech)</option>
+                                </Select>
+                            </div>
                             <div>
                                 <Label>Theme</Label>
                                 <Select value={heroParams.theme} onChange={e => setHeroParams({ ...heroParams, theme: e.target.value })} fullWidth>
@@ -100,6 +109,9 @@ export function TemplateSidebar({
                                     <option value="green-blue">Green & Blue</option>
                                 </Select>
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <Label>Language</Label>
                                 <Select value={heroParams.lang} onChange={e => setHeroParams({ ...heroParams, lang: e.target.value })} fullWidth>

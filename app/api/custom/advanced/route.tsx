@@ -9,24 +9,23 @@ export async function GET(request: NextRequest) {
         const searchParams = request.nextUrl.searchParams;
 
         // Parámetros
-        const content = searchParams.get('content') || 'Hello World';
         const title = searchParams.get('title') || '';
+        const content = searchParams.get('content') || searchParams.get('description') || 'No content provided';
         const subtitle = searchParams.get('subtitle') || '';
         const width = parseInt(searchParams.get('width') || '800');
         const height = parseInt(searchParams.get('height') || '400');
-        const layout = searchParams.get('layout') || 'center'; // center, left, card
 
         // Theme Params
         const themeName = searchParams.get('theme') || 'purple-cyan';
         const customColor = searchParams.get('customColor') || undefined;
+        const customColor2 = searchParams.get('customColor2') || undefined;
 
         // Shared Theme Logic
-        const t = getTheme(themeName, customColor);
+        const t = getTheme(themeName, customColor, customColor2);
 
         // Map to Advanced Local Theme Structure
         const currentTheme = {
             bg: t.bg,
-            // Use gradient if defined, otherwise generic hex
             bgGradient: t.bgGradient,
             text: '#ffffff',
             accent: t.accent,
@@ -34,34 +33,15 @@ export async function GET(request: NextRequest) {
             border: customColor ? `${t.accent}40` : 'rgba(255, 255, 255, 0.1)',
         };
 
-
-        // Layouts diferentes
-        const layouts: Record<string, any> = {
-            center: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-            },
-            left: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                textAlign: 'left',
-                paddingLeft: '60px',
-            },
-            card: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'flex-start',
-                padding: '40px',
-            },
+        // Layout Fijo (Card-like centrado)
+        const currentLayout = {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            padding: '40px',
         };
-
-        const currentLayout = layouts[layout] || layouts.center;
 
         // JSX para Satori
         const jsx = (
@@ -107,78 +87,64 @@ export async function GET(request: NextRequest) {
                         height: '100%',
                         position: 'relative',
                         zIndex: 1,
-                    }}
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    } as React.CSSProperties}
                 >
                     {/* Título */}
                     {title && (
                         <div
                             style={{
-                                fontSize: '48px',
+                                fontSize: '64px',
                                 fontWeight: 'bold',
                                 marginBottom: '20px',
-                                background: t.gradient, // Use theme gradient for title
+                                backgroundImage: t.gradient, // Use backgroundImage
                                 backgroundClip: 'text',
                                 color: 'transparent',
+                                textAlign: 'center',
+                                paddingRight: '10px'
                             }}
                         >
                             {title}
                         </div>
                     )}
 
-                    {/* Contenido principal */}
-                    <div
-                        style={{
-                            fontSize: '32px',
-                            fontWeight: '600',
-                            marginBottom: subtitle ? '15px' : '0',
-                            color: currentTheme.text,
-                        }}
-                    >
-                        {content}
-                    </div>
+                    {/* Content (Main Text) */}
+                    {content && (
+                        <div
+                            style={{
+                                fontSize: '28px',
+                                fontWeight: '500',
+                                color: currentTheme.text,
+                                textAlign: 'center',
+                                maxWidth: '80%',
+                                lineHeight: '1.4',
+                                opacity: 0.9,
+                                marginBottom: subtitle ? '16px' : '0'
+                            }}
+                        >
+                            {content}
+                        </div>
+                    )}
 
-                    {/* Subtítulo */}
+                    {/* Subtitle */}
                     {subtitle && (
                         <div
                             style={{
                                 fontSize: '20px',
-                                color: currentTheme.secondary,
                                 fontWeight: '400',
+                                color: currentTheme.secondary,
+                                textAlign: 'center',
+                                maxWidth: '80%',
+                                opacity: 0.8,
                             }}
                         >
                             {subtitle}
                         </div>
                     )}
-
-                    {/* Accent line decorativa */}
-                    {layout === 'card' && (
-                        <div
-                            style={{
-                                width: '100px',
-                                height: '4px',
-                                background: currentTheme.accent,
-                                marginTop: '30px',
-                                borderRadius: '2px',
-                            }}
-                        />
-                    )}
                 </div>
-
-                {/* Border decorativo para layout card */}
-                {layout === 'card' && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: '20px',
-                            left: '20px',
-                            right: '20px',
-                            bottom: '20px',
-                            border: `1px solid ${currentTheme.border}`,
-                            borderRadius: '20px',
-                            pointerEvents: 'none',
-                        }}
-                    />
-                )}
             </div>
         );
 

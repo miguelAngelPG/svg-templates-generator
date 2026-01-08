@@ -16,43 +16,47 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const component = searchParams.get('component') || 'stat';
     const themeName = searchParams.get('theme') || 'purple-cyan';
+    const content = searchParams.get('content') || undefined;
+    const value = searchParams.get('value') || '0';
+    const label = searchParams.get('label') || '';
+    const componentType = searchParams.get('component') || 'stat';
     const customColor = searchParams.get('customColor') || undefined;
+    const customColor2 = searchParams.get('customColor2') || undefined;
+
+    const useNewRender = true; // Flag to easily switch if needed
 
     const title = searchParams.get('title') || 'Title';
-    const content = searchParams.get('content') || '';
     const icon = searchParams.get('icon') || '✨';
-    const value = searchParams.get('value') || '100';
-    const label = searchParams.get('label') || 'Label';
 
-    // Theme Logic
-    const t = getTheme(themeName, customColor);
+    // 1. Get Theme (now supports multiple custom colors)
+    const ultraTheme = getTheme(themeName, customColor, customColor2);
+
+    // Adapt theme object for Ultra components
     const theme = {
-      bg: t.bgGradient || t.bg,
-      border: customColor ? `${t.accent}40` : 'rgba(255, 255, 255, 0.1)',
+      bg: ultraTheme.bgGradient || ultraTheme.bg,
+      border: customColor ? `${ultraTheme.accent}40` : 'rgba(255, 255, 255, 0.1)',
       text: '#ffffff',
       secondary: '#94a3b8',
-      accent: t.accent,
-      blob1: t.blob1,
-      blob2: t.blob2
+      accent: ultraTheme.accent,
+      blob1: ultraTheme.blob1,
+      blob2: ultraTheme.blob2
     };
 
     let componentJsx: React.ReactElement;
 
     // Select Pure SVG Component
-    switch (component) {
-      case 'quote':
-        componentJsx = <UltraQuote content={content} title={title} label={label} icon={icon} theme={theme} />;
-        break;
-      case 'card':
-        componentJsx = <UltraCard title={title} content={content} icon={icon} theme={theme} />;
-        break;
-      case 'badge':
-        componentJsx = <UltraBadge title={title} content={content} icon={icon} value={value} theme={theme} />;
-        break;
-      case 'stat':
-      default:
-        componentJsx = <UltraStat value={value} label={label} icon={icon} content={content} theme={theme} />;
-        break;
+    // Select component
+    if (component === 'quote') {
+      // UltraQuote uses title as author/header
+      componentJsx = <UltraQuote theme={theme} content={content || 'No content provided'} title={title} label={label} icon={icon} />;
+    } else if (component === 'card') {
+      // UltraCard doesn't use value/label typically, but we pass icon clearly
+      componentJsx = <UltraCard theme={theme} title={title} content={content || ''} icon={icon} />;
+    } else if (component === 'badge') {
+      componentJsx = <UltraBadge theme={theme} title={title} content={content || ''} icon={icon} value={value} />;
+    } else {
+      // Default to Stat
+      componentJsx = <UltraStat theme={theme} value={value} label={label || 'Label'} icon={icon} content={content || ''} />;
     }
 
     // Single source of truth: Render the EXACT same component instance to string

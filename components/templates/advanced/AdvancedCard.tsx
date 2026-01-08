@@ -98,13 +98,13 @@ export const AdvancedCard: React.FC<AdvancedCardProps> = ({
                 }}
             >
                 {/* Title */}
-                {title && (
+                {title && content && (
                     <div
                         style={{
                             fontSize: '48px',
                             fontWeight: 'bold',
                             marginBottom: '20px',
-                            background: theme.gradient,
+                            backgroundImage: theme.gradient,
                             backgroundClip: 'text',
                             color: 'transparent',
                             // Fallback for backgroundClip text in some contexts if needed, but standard browsers support it

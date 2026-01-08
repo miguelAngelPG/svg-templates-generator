@@ -40,8 +40,8 @@ export const ModernTemplate = ({ name, title, subtitle, location, theme: c }: Te
             </div>
 
             <h1 style={{
-                fontSize: name.length > 15 ? '48px' : '64px',
-                fontWeight: 800, margin: 0, lineHeight: 1, backgroundImage: c.gradient, backgroundClip: 'text', color: 'transparent'
+                fontSize: name.length > 15 ? '48px' : '64px', zIndex: 100,
+                fontWeight: 800, margin: 0, lineHeight: 1.5, backgroundImage: c.gradient, backgroundClip: 'text', color: 'transparent'
             }}>{name}</h1>
             <div style={{ fontSize: '24px', color: '#e5e7eb', marginTop: '12px' }}>{title}</div>
             <div style={{ fontSize: '16px', color: '#9ca3af', marginTop: '8px' }}>{subtitle}</div>

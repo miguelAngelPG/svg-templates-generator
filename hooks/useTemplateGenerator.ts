@@ -9,8 +9,8 @@ export interface AdvancedParams {
     width: number;
     height: number;
     theme: string;
-    layout: string;
     customColor?: string;
+    customColor2?: string;
 }
 
 export interface HeroParams {
@@ -18,13 +18,14 @@ export interface HeroParams {
     title: string;
     subtitle: string;
     location: string;
-    theme: string;
     style: string;
+    theme: string;
     customColor?: string;
+    customColor2?: string;
 }
 
 export interface UltraParams {
-    component: string;
+    component: 'stat' | 'quote' | 'card' | 'badge';
     title: string;
     content: string;
     icon: string;
@@ -32,6 +33,7 @@ export interface UltraParams {
     label: string;
     theme: string;
     customColor?: string;
+    customColor2?: string;
 }
 
 export function useTemplateGenerator() {
@@ -46,8 +48,9 @@ export function useTemplateGenerator() {
         subtitle: 'Q1 2026 Roadmap',
         width: 800,
         height: 400,
-        theme: 'dark',
-        layout: 'center'
+        theme: 'purple-cyan',
+        customColor: '#8855ff',
+        customColor2: '#ffffff'
     });
 
     const [heroParams, setHeroParams] = useState<HeroParams>({
@@ -56,9 +59,9 @@ export function useTemplateGenerator() {
         subtitle: 'Human first, Engineer second',
         location: 'Hidalgo, MX',
         theme: 'purple-cyan',
-
         style: 'modern',
-        customColor: '#00f2ff'
+        customColor: '#00f2ff',
+        customColor2: '#ffffff'
     });
 
     const [ultraParams, setUltraParams] = useState<UltraParams>({
@@ -69,6 +72,8 @@ export function useTemplateGenerator() {
         value: '12.5k',
         label: 'Growth',
         theme: 'purple-cyan',
+        customColor: '#00f2ff',
+        customColor2: '#ffffff'
     });
 
     // Debounced Generation

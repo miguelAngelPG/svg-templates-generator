@@ -6,6 +6,7 @@ import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
 import { TemplateType, AdvancedParams, HeroParams, UltraParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
+import { HERO_THEMES } from '@/utils/themes';
 
 interface TemplateSidebarProps {
     selectedTemplate: TemplateType;
@@ -27,6 +28,18 @@ export function TemplateSidebar({
     heroParams, setHeroParams,
     ultraParams, setUltraParams
 }: TemplateSidebarProps) {
+
+    // Helper to render theme options dynamically
+    const renderThemeOptions = () => (
+        <>
+            {Object.keys(HERO_THEMES).map(key => (
+                <option key={key} value={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1).replace('-', ' ')}
+                </option>
+            ))}
+            <option value="custom">Custom Color</option>
+        </>
+    );
 
     return (
         <div className="flex flex-col gap-6 h-full">
@@ -58,46 +71,62 @@ export function TemplateSidebar({
                 {selectedTemplate === 'advanced' && (
                     <>
                         <ConfigField label="Title" value={advancedParams.title} onChange={v => setAdvancedParams({ ...advancedParams, title: v })} maxLength={40} />
-                        <ConfigField label="Content" value={advancedParams.content} onChange={v => setAdvancedParams({ ...advancedParams, content: v })} maxLength={60} />
-                        <ConfigField label="Subtitle" value={advancedParams.subtitle} onChange={v => setAdvancedParams({ ...advancedParams, subtitle: v })} maxLength={40} />
+                        <div>
+                            <Label>Description</Label>
+                            <textarea
+                                value={advancedParams.content}
+                                onChange={(e) => setAdvancedParams({ ...advancedParams, content: e.target.value })}
+                                maxLength={120}
+                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-20 resize-none mt-1"
+                            />
+                        </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <Label>Theme</Label>
-                                <Select value={advancedParams.theme} onChange={e => setAdvancedParams({ ...advancedParams, theme: e.target.value })} fullWidth>
-                                    <option value="purple-cyan">Purple/Cyan</option>
-                                    <option value="orange-pink">Orange/Pink</option>
-                                    <option value="green-blue">Green/Blue</option>
-                                    <option value="custom">Custom Color</option>
-                                </Select>
-                            </div>
-                            <div>
-                                <Label>Layout</Label>
-                                <Select value={advancedParams.layout} onChange={e => setAdvancedParams({ ...advancedParams, layout: e.target.value })} fullWidth>
-                                    <option value="center">Center</option>
-                                    <option value="left">Left Aligned</option>
-                                    <option value="card">Card Style</option>
-                                </Select>
-                            </div>
+                        <div className="mt-2">
+                            <Label>Theme</Label>
+                            <Select value={advancedParams.theme} onChange={e => setAdvancedParams({ ...advancedParams, theme: e.target.value })} fullWidth>
+                                {renderThemeOptions()}
+                            </Select>
                         </div>
 
                         {advancedParams.theme === 'custom' && (
-                            <div>
-                                <Label>Accent Color</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="color"
-                                        value={advancedParams.customColor || '#8855ff'}
-                                        onChange={e => setAdvancedParams({ ...advancedParams, customColor: e.target.value })}
-                                        className="w-10 h-10 p-1 cursor-pointer"
-                                    />
-                                    <Input
-                                        type="text"
-                                        value={advancedParams.customColor || '#8855ff'}
-                                        onChange={e => setAdvancedParams({ ...advancedParams, customColor: e.target.value })}
-                                        fullWidth
-                                        maxLength={7}
-                                    />
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={advancedParams.customColor || '#8855ff'}
+                                            onChange={e => setAdvancedParams({ ...advancedParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={advancedParams.customColor || '#8855ff'}
+                                            onChange={e => setAdvancedParams({ ...advancedParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={advancedParams.customColor2 || '#ffffff'}
+                                            onChange={e => setAdvancedParams({ ...advancedParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={advancedParams.customColor2 || '#ffffff'}
+                                            onChange={e => setAdvancedParams({ ...advancedParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -124,31 +153,50 @@ export function TemplateSidebar({
                             <div>
                                 <Label>Theme</Label>
                                 <Select value={heroParams.theme} onChange={e => setHeroParams({ ...heroParams, theme: e.target.value })} fullWidth>
-                                    <option value="purple-cyan">Purple & Cyan</option>
-                                    <option value="orange-pink">Orange & Pink</option>
-                                    <option value="green-blue">Green & Blue</option>
-                                    <option value="custom">Custom Color</option>
+                                    {renderThemeOptions()}
                                 </Select>
                             </div>
                         </div>
 
                         {heroParams.theme === 'custom' && (
-                            <div>
-                                <Label>Accent Color</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="color"
-                                        value={heroParams.customColor}
-                                        onChange={e => setHeroParams({ ...heroParams, customColor: e.target.value })}
-                                        className="w-10 h-10 p-1 cursor-pointer"
-                                    />
-                                    <Input
-                                        type="text"
-                                        value={heroParams.customColor}
-                                        onChange={e => setHeroParams({ ...heroParams, customColor: e.target.value })}
-                                        fullWidth
-                                        maxLength={7}
-                                    />
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={heroParams.customColor || '#00f2ff'}
+                                            onChange={e => setHeroParams({ ...heroParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={heroParams.customColor}
+                                            onChange={e => setHeroParams({ ...heroParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={heroParams.customColor2 || '#ffffff'}
+                                            onChange={e => setHeroParams({ ...heroParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={heroParams.customColor2 || '#ffffff'}
+                                            onChange={e => setHeroParams({ ...heroParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -160,7 +208,7 @@ export function TemplateSidebar({
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <Label>Component</Label>
-                                <Select value={ultraParams.component} onChange={e => setUltraParams({ ...ultraParams, component: e.target.value })} fullWidth>
+                                <Select value={ultraParams.component} onChange={e => setUltraParams({ ...ultraParams, component: e.target.value as any })} fullWidth>
                                     <option value="stat">Statistic</option>
                                     <option value="quote">Quote</option>
                                     <option value="card">Card</option>
@@ -170,31 +218,50 @@ export function TemplateSidebar({
                             <div>
                                 <Label>Theme</Label>
                                 <Select value={ultraParams.theme} onChange={e => setUltraParams({ ...ultraParams, theme: e.target.value })} fullWidth>
-                                    <option value="purple-cyan">Purple/Cyan</option>
-                                    <option value="orange-pink">Orange/Pink</option>
-                                    <option value="green-blue">Green/Blue</option>
-                                    <option value="custom">Custom Color</option>
+                                    {renderThemeOptions()}
                                 </Select>
                             </div>
                         </div>
 
                         {ultraParams.theme === 'custom' && (
-                            <div className="mb-2">
-                                <Label>Accent Color</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="color"
-                                        value={ultraParams.customColor || '#00f2ff'}
-                                        onChange={e => setUltraParams({ ...ultraParams, customColor: e.target.value })}
-                                        className="w-10 h-10 p-1 cursor-pointer"
-                                    />
-                                    <Input
-                                        type="text"
-                                        value={ultraParams.customColor || '#00f2ff'}
-                                        onChange={e => setUltraParams({ ...ultraParams, customColor: e.target.value })}
-                                        fullWidth
-                                        maxLength={7}
-                                    />
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={ultraParams.customColor || '#00f2ff'}
+                                            onChange={e => setUltraParams({ ...ultraParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={ultraParams.customColor || '#00f2ff'}
+                                            onChange={e => setUltraParams({ ...ultraParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={ultraParams.customColor2 || '#ffffff'}
+                                            onChange={e => setUltraParams({ ...ultraParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={ultraParams.customColor2 || '#ffffff'}
+                                            onChange={e => setUltraParams({ ...ultraParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}

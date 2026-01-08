@@ -111,15 +111,7 @@ export function TemplateSidebar({
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <Label>Language</Label>
-                                <Select value={heroParams.lang} onChange={e => setHeroParams({ ...heroParams, lang: e.target.value })} fullWidth>
-                                    <option value="en">English</option>
-                                    <option value="es">Español</option>
-                                </Select>
-                            </div>
-                        </div>
+
                     </>
                 )}
 

@@ -18,7 +18,7 @@ export interface HeroParams {
     subtitle: string;
     location: string;
     theme: string;
-    lang: string;
+
     style: string;
 }
 
@@ -54,7 +54,7 @@ export function useTemplateGenerator() {
         subtitle: 'Human first, Engineer second',
         location: 'Hidalgo, MX',
         theme: 'purple-cyan',
-        lang: 'en',
+
         style: 'modern'
     });
 

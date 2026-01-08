@@ -1,6 +1,8 @@
 import React from 'react';
 import { Download, Copy, ExternalLink, Github } from 'lucide-react';
 import { Button } from '../atoms/Button';
+import { Input } from '../atoms/Input';
+import { Label } from '../atoms/Label';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -60,11 +62,49 @@ export function TemplatePreview({ generatedUrl, isLoading, templateName }: Templ
 
                 </div>
 
-                {generatedUrl && (
-                    <div className="p-4 bg-[#111] border-t border-gray-800 font-mono text-xs text-cyan-400 break-all">
-                        {fullUrl}
+                <div className="p-4 bg-[#111] border-t border-gray-800 flex flex-col gap-4">
+                    <div>
+                        <Label>GitHub Markdown</Label>
+                        <div className="flex gap-2">
+                            <Input
+                                value={`![${templateName}](${fullUrl})`}
+                                readOnly
+                                fullWidth
+                                onClick={(e) => e.currentTarget.select()}
+                                className="font-mono text-xs text-cyan-400"
+                            />
+                            <Button
+                                variant="outline"
+                                className="w-12 px-0 shrink-0"
+                                onClick={handleCopyMarkdown}
+                                title="Copy Markdown"
+                                icon={<Copy className="w-4 h-4" />}
+                            />
+                        </div>
                     </div>
-                )}
+                    <div>
+                        <Label>Direct URL</Label>
+                        <div className="flex gap-2">
+                            <Input
+                                value={fullUrl}
+                                readOnly
+                                fullWidth
+                                onClick={(e) => e.currentTarget.select()}
+                                className="font-mono text-xs text-gray-400"
+                            />
+                            <Button
+                                variant="outline"
+                                className="w-12 px-0 shrink-0"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(fullUrl);
+                                    alert('URL copied to clipboard!');
+                                }}
+                                title="Copy URL"
+                                icon={<Copy className="w-4 h-4" />}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -41,6 +41,9 @@ export default function TemplatesPage() {
                 generatedUrl={generatedUrl}
                 isLoading={isLoading}
                 templateName={selectedTemplate}
+                advancedParams={advancedParams}
+                heroParams={heroParams}
+                ultraParams={ultraParams}
             />
 
         </div>

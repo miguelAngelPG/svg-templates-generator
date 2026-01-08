@@ -57,19 +57,18 @@ export function TemplateSidebar({
 
                 {selectedTemplate === 'advanced' && (
                     <>
-                        <ConfigField label="Title" value={advancedParams.title} onChange={v => setAdvancedParams({ ...advancedParams, title: v })} />
-                        <ConfigField label="Content" value={advancedParams.content} onChange={v => setAdvancedParams({ ...advancedParams, content: v })} />
-                        <ConfigField label="Subtitle" value={advancedParams.subtitle} onChange={v => setAdvancedParams({ ...advancedParams, subtitle: v })} />
+                        <ConfigField label="Title" value={advancedParams.title} onChange={v => setAdvancedParams({ ...advancedParams, title: v })} maxLength={40} />
+                        <ConfigField label="Content" value={advancedParams.content} onChange={v => setAdvancedParams({ ...advancedParams, content: v })} maxLength={60} />
+                        <ConfigField label="Subtitle" value={advancedParams.subtitle} onChange={v => setAdvancedParams({ ...advancedParams, subtitle: v })} maxLength={40} />
 
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <Label>Theme</Label>
                                 <Select value={advancedParams.theme} onChange={e => setAdvancedParams({ ...advancedParams, theme: e.target.value })} fullWidth>
-                                    <option value="dark">Dark</option>
-                                    <option value="light">Light</option>
-                                    <option value="purple">Purple</option>
-                                    <option value="cyan">Cyan</option>
-                                    <option value="orange">Orange</option>
+                                    <option value="purple-cyan">Purple/Cyan</option>
+                                    <option value="orange-pink">Orange/Pink</option>
+                                    <option value="green-blue">Green/Blue</option>
+                                    <option value="custom">Custom Color</option>
                                 </Select>
                             </div>
                             <div>
@@ -81,6 +80,27 @@ export function TemplateSidebar({
                                 </Select>
                             </div>
                         </div>
+
+                        {advancedParams.theme === 'custom' && (
+                            <div>
+                                <Label>Accent Color</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="color"
+                                        value={advancedParams.customColor || '#8855ff'}
+                                        onChange={e => setAdvancedParams({ ...advancedParams, customColor: e.target.value })}
+                                        className="w-10 h-10 p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        type="text"
+                                        value={advancedParams.customColor || '#8855ff'}
+                                        onChange={e => setAdvancedParams({ ...advancedParams, customColor: e.target.value })}
+                                        fullWidth
+                                        maxLength={7}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </>
                 )}
 
@@ -132,8 +152,6 @@ export function TemplateSidebar({
                                 </div>
                             </div>
                         )}
-
-
                     </>
                 )}
 
@@ -153,25 +171,47 @@ export function TemplateSidebar({
                                 <Label>Theme</Label>
                                 <Select value={ultraParams.theme} onChange={e => setUltraParams({ ...ultraParams, theme: e.target.value })} fullWidth>
                                     <option value="purple-cyan">Purple/Cyan</option>
-                                    <option value="orange-warm">Warm Orange</option>
-                                    <option value="green-fresh">Fresh Green</option>
+                                    <option value="orange-pink">Orange/Pink</option>
+                                    <option value="green-blue">Green/Blue</option>
+                                    <option value="custom">Custom Color</option>
                                 </Select>
                             </div>
                         </div>
 
+                        {ultraParams.theme === 'custom' && (
+                            <div className="mb-2">
+                                <Label>Accent Color</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="color"
+                                        value={ultraParams.customColor || '#00f2ff'}
+                                        onChange={e => setUltraParams({ ...ultraParams, customColor: e.target.value })}
+                                        className="w-10 h-10 p-1 cursor-pointer"
+                                    />
+                                    <Input
+                                        type="text"
+                                        value={ultraParams.customColor || '#00f2ff'}
+                                        onChange={e => setUltraParams({ ...ultraParams, customColor: e.target.value })}
+                                        fullWidth
+                                        maxLength={7}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex gap-2">
                             <div className="w-1/4">
-                                <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} />
+                                <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
                             </div>
                             <div className="flex-1">
-                                <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} />
+                                <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={25} />
                             </div>
                         </div>
 
                         {ultraParams.component === 'stat' && (
                             <div className="grid grid-cols-2 gap-2">
-                                <ConfigField label="Value" value={ultraParams.value} onChange={v => setUltraParams({ ...ultraParams, value: v })} />
-                                <ConfigField label="Label" value={ultraParams.label} onChange={v => setUltraParams({ ...ultraParams, label: v })} />
+                                <ConfigField label="Value" value={ultraParams.value} onChange={v => setUltraParams({ ...ultraParams, value: v })} maxLength={10} />
+                                <ConfigField label="Label" value={ultraParams.label} onChange={v => setUltraParams({ ...ultraParams, label: v })} maxLength={15} />
                             </div>
                         )}
 
@@ -180,6 +220,7 @@ export function TemplateSidebar({
                             <textarea
                                 value={ultraParams.content}
                                 onChange={(e) => setUltraParams({ ...ultraParams, content: e.target.value })}
+                                maxLength={100}
                                 className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-24 resize-none mt-1"
                             />
                         </div>

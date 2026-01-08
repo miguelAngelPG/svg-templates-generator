@@ -1,13 +1,12 @@
 import { NextRequest } from 'next/server';
 import satori from 'satori';
 import React from 'react';
+import { getTheme } from '@/utils/themes';
 
 export async function GET(request: NextRequest) {
     try {
         console.log('API Hit: /api/custom/advanced');
         const searchParams = request.nextUrl.searchParams;
-        const params = Object.fromEntries(searchParams.entries());
-        console.log('Params:', params);
 
         // Parámetros
         const content = searchParams.get('content') || 'Hello World';
@@ -15,61 +14,26 @@ export async function GET(request: NextRequest) {
         const subtitle = searchParams.get('subtitle') || '';
         const width = parseInt(searchParams.get('width') || '800');
         const height = parseInt(searchParams.get('height') || '400');
-        const theme = searchParams.get('theme') || 'dark';
         const layout = searchParams.get('layout') || 'center'; // center, left, card
 
-        console.log('Parsed config:', { width, height, theme, layout });
+        // Theme Params
+        const themeName = searchParams.get('theme') || 'purple-cyan';
+        const customColor = searchParams.get('customColor') || undefined;
 
-        // Colores personalizables
-        const bgColor = searchParams.get('bg') || '';
-        const textColor = searchParams.get('color') || '';
-        const accentColor = searchParams.get('accent') || '';
+        // Shared Theme Logic
+        const t = getTheme(themeName, customColor);
 
-        // Temas predefinidos
-        const themes = {
-            dark: {
-                bg: '#050505',
-                text: '#ffffff',
-                accent: '#00f2ff',
-                secondary: '#666666',
-                border: 'rgba(255, 255, 255, 0.1)',
-            },
-            light: {
-                bg: '#ffffff',
-                text: '#000000',
-                accent: '#0066ff',
-                secondary: '#999999',
-                border: 'rgba(0, 0, 0, 0.1)',
-            },
-            purple: {
-                bg: '#0f0a1f',
-                text: '#ffffff',
-                accent: '#bd00ff',
-                secondary: '#8855ff',
-                border: 'rgba(189, 0, 255, 0.2)',
-            },
-            cyan: {
-                bg: '#041421',
-                text: '#ffffff',
-                accent: '#00f2ff',
-                secondary: '#4d47c3',
-                border: 'rgba(0, 242, 255, 0.2)',
-            },
-            orange: {
-                bg: '#1a0f05',
-                text: '#ffffff',
-                accent: '#ffaa40',
-                secondary: '#ff6b35',
-                border: 'rgba(255, 170, 64, 0.2)',
-            },
+        // Map to Advanced Local Theme Structure
+        const currentTheme = {
+            bg: t.bg,
+            // Use gradient if defined, otherwise generic hex
+            bgGradient: t.bgGradient,
+            text: '#ffffff',
+            accent: t.accent,
+            secondary: 'rgba(255, 255, 255, 0.6)',
+            border: customColor ? `${t.accent}40` : 'rgba(255, 255, 255, 0.1)',
         };
 
-        const currentTheme = themes[theme as keyof typeof themes] || themes.dark;
-
-        // Override con colores custom si se proporcionan
-        if (bgColor) currentTheme.bg = bgColor;
-        if (textColor) currentTheme.text = textColor;
-        if (accentColor) currentTheme.accent = accentColor;
 
         // Layouts diferentes
         const layouts: Record<string, any> = {
@@ -107,123 +71,114 @@ export async function GET(request: NextRequest) {
                     height: '100%',
                     display: 'flex',
                     backgroundColor: currentTheme.bg,
+                    backgroundImage: currentTheme.bgGradient, // Support Gradient
                     color: currentTheme.text,
                     fontFamily: 'Inter, sans-serif',
                     position: 'relative',
-                }
-                }
+                }}
             >
-                {/* Gradiente de fondo opcional */}
-                < div
+                {/* Gradiente de fondo opcional (Blobs from theme) */}
+                <div
                     style={{
                         position: 'absolute',
                         width: '100%',
                         height: '100%',
-                        background: `radial-gradient(circle at 30% 20%, ${currentTheme.accent}15 0%, transparent 50%)`,
-                    }
-                    }
+                        background: `radial-gradient(circle at 30% 20%, ${t.blob1}20 0%, transparent 50%)`,
+                        zIndex: 0
+                    }}
+                />
+                <div
+                    style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0,
+                        width: '80%',
+                        height: '80%',
+                        background: `radial-gradient(circle at 80% 80%, ${t.blob2}15 0%, transparent 50%)`,
+                        zIndex: 0
+                    }}
                 />
 
                 {/* Contenido principal */}
                 <div
-                    style={
-                        {
-                            ...currentLayout,
-                            width: '100%',
-                            height: '100%',
-                            position: 'relative',
-                            zIndex: 1,
-                        }
-                    }
+                    style={{
+                        ...currentLayout,
+                        width: '100%',
+                        height: '100%',
+                        position: 'relative',
+                        zIndex: 1,
+                    }}
                 >
                     {/* Título */}
-                    {
-                        title && (
-                            <div
-                                style={
-                                    {
-                                        fontSize: '48px',
-                                        fontWeight: 'bold',
-                                        marginBottom: '20px',
-                                        background: `linear-gradient(135deg, ${currentTheme.text} 0%, ${currentTheme.secondary} 100%)`,
-                                        backgroundClip: 'text',
-                                        color: 'transparent',
-                                    }
-                                }
-                            >
-                                {title}
-                            </div>
-                        )
-                    }
+                    {title && (
+                        <div
+                            style={{
+                                fontSize: '48px',
+                                fontWeight: 'bold',
+                                marginBottom: '20px',
+                                background: t.gradient, // Use theme gradient for title
+                                backgroundClip: 'text',
+                                color: 'transparent',
+                            }}
+                        >
+                            {title}
+                        </div>
+                    )}
 
                     {/* Contenido principal */}
                     <div
-                        style={
-                            {
-                                fontSize: '32px',
-                                fontWeight: '600',
-                                marginBottom: subtitle ? '15px' : '0',
-                                color: currentTheme.text,
-                            }
-                        }
+                        style={{
+                            fontSize: '32px',
+                            fontWeight: '600',
+                            marginBottom: subtitle ? '15px' : '0',
+                            color: currentTheme.text,
+                        }}
                     >
                         {content}
                     </div>
 
                     {/* Subtítulo */}
-                    {
-                        subtitle && (
-                            <div
-                                style={
-                                    {
-                                        fontSize: '20px',
-                                        color: currentTheme.secondary,
-                                        fontWeight: '400',
-                                    }
-                                }
-                            >
-                                {subtitle}
-                            </div>
-                        )
-                    }
+                    {subtitle && (
+                        <div
+                            style={{
+                                fontSize: '20px',
+                                color: currentTheme.secondary,
+                                fontWeight: '400',
+                            }}
+                        >
+                            {subtitle}
+                        </div>
+                    )}
 
                     {/* Accent line decorativa */}
-                    {
-                        layout === 'card' && (
-                            <div
-                                style={
-                                    {
-                                        width: '100px',
-                                        height: '4px',
-                                        background: currentTheme.accent,
-                                        marginTop: '30px',
-                                        borderRadius: '2px',
-                                    }
-                                }
-                            />
-                        )
-                    }
+                    {layout === 'card' && (
+                        <div
+                            style={{
+                                width: '100px',
+                                height: '4px',
+                                background: currentTheme.accent,
+                                marginTop: '30px',
+                                borderRadius: '2px',
+                            }}
+                        />
+                    )}
                 </div>
 
                 {/* Border decorativo para layout card */}
-                {
-                    layout === 'card' && (
-                        <div
-                            style={
-                                {
-                                    position: 'absolute',
-                                    top: '20px',
-                                    left: '20px',
-                                    right: '20px',
-                                    bottom: '20px',
-                                    border: `1px solid ${currentTheme.border}`,
-                                    borderRadius: '20px',
-                                    pointerEvents: 'none',
-                                }
-                            }
-                        />
-                    )
-                }
+                {layout === 'card' && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '20px',
+                            left: '20px',
+                            right: '20px',
+                            bottom: '20px',
+                            border: `1px solid ${currentTheme.border}`,
+                            borderRadius: '20px',
+                            pointerEvents: 'none',
+                        }}
+                    />
+                )}
             </div>
         );
 
@@ -264,26 +219,7 @@ export async function GET(request: NextRequest) {
 
     } catch (error) {
         console.error('Error generating custom SVG:', error);
-
-        const errorSvg = `
-                                <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <style>
-                                            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap');
-                                        </style>
-                                    </defs>
-                                    <rect width="800" height="400" fill="#1a1a1a" />
-                                    <text x="400" y="180" text-anchor="middle" fill="#ff4444" font-size="28" font-family="Inter, sans-serif" font-weight="700">
-                                        ⚠️ Error Generating SVG
-                                    </text>
-                                    <text x="400" y="220" text-anchor="middle" fill="#ffffff" font-size="16" font-family="Inter, sans-serif">
-                                        ${error instanceof Error ? error.message.substring(0, 60) : 'Unknown error'}
-                                    </text>
-                                    <text x="400" y="250" text-anchor="middle" fill="#888888" font-size="12" font-family="Inter, sans-serif">
-                                        Check your parameters and try again
-                                    </text>
-                                </svg>
-                                `;
+        const errorSvg = `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="400" fill="#111"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f87171" font-family="sans-serif">Error: ${(error as any).message}</text></svg>`;
 
         return new Response(errorSvg, {
             headers: {

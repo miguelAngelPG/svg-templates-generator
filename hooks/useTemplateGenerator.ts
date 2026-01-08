@@ -10,6 +10,7 @@ export interface AdvancedParams {
     height: number;
     theme: string;
     layout: string;
+    customColor?: string;
 }
 
 export interface HeroParams {
@@ -30,6 +31,7 @@ export interface UltraParams {
     value: string;
     label: string;
     theme: string;
+    customColor?: string;
 }
 
 export function useTemplateGenerator() {

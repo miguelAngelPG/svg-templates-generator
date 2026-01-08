@@ -199,15 +199,32 @@ export function TemplateSidebar({
                             </div>
                         )}
 
-                        <div className="flex gap-2">
-                            <div className="w-1/4">
-                                <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
+                        {/* Layout for Badge: Icon + Value + Title in one row */}
+                        {ultraParams.component === 'badge' ? (
+                            <div className="flex gap-2 mb-2">
+                                <div className="w-[15%]">
+                                    <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
+                                </div>
+                                <div className="w-[25%]">
+                                    <ConfigField label="Value" value={ultraParams.value} onChange={v => setUltraParams({ ...ultraParams, value: v })} maxLength={8} />
+                                </div>
+                                <div className="flex-1">
+                                    <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={15} />
+                                </div>
                             </div>
-                            <div className="flex-1">
-                                <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={25} />
+                        ) : (
+                            /* Standard Layout for others */
+                            <div className="flex gap-2 mb-2">
+                                <div className="w-1/4">
+                                    <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
+                                </div>
+                                <div className="flex-1">
+                                    <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={25} />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
+                        {/* Extra fields for Stat only */}
                         {ultraParams.component === 'stat' && (
                             <div className="grid grid-cols-2 gap-2">
                                 <ConfigField label="Value" value={ultraParams.value} onChange={v => setUltraParams({ ...ultraParams, value: v })} maxLength={10} />
@@ -221,7 +238,13 @@ export function TemplateSidebar({
                                 value={ultraParams.content}
                                 onChange={(e) => setUltraParams({ ...ultraParams, content: e.target.value })}
                                 maxLength={100}
-                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-24 resize-none mt-1"
+                                placeholder={
+                                    ultraParams.component === 'badge' ? 'Ex: Verified Developer (Optional detail)' :
+                                        ultraParams.component === 'stat' ? 'Ex: +24% increase vs last month' :
+                                            ultraParams.component === 'quote' ? 'Ex: "The only way to do great work is to love what you do."' :
+                                                'Ex: Include a brief description of the featured item here.'
+                                }
+                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-24 resize-none mt-1 placeholder-gray-600"
                             />
                         </div>
                     </>

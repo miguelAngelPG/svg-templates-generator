@@ -47,10 +47,6 @@ export function TemplatePreview({
 
     // --- Live Rendering Logic ---
     const renderPreview = useMemo(() => {
-        // Calculate dimensions based on template type? 
-        // Or just force a scaler. For now, let's render at 100% or scaled down with CSS transform.
-        // Ultra and Advanced have variable width/height.
-
         let width = 800;
         let height = 400;
         let component = null;
@@ -71,16 +67,11 @@ export function TemplatePreview({
             else if (heroParams.style === 'cyber') component = <CyberTemplate {...heroParams} theme={theme} />;
         }
         else if (templateName === 'ultra') {
-            // Ultra dimensions are usually passed in params (defaults in hook) or fixed?
-            // UltraParams doesn't have width/height in the interface I defined earlier? 
-            // Wait, useTemplateGenerator hook has them in default state but maybe not interface?
-            // Let's assume standard defaults if missing or check specific component logic.
-            // Ultra route usually defaults to 600x300.
             width = 600;
             height = 300;
             const theme = getTheme(ultraParams.theme, ultraParams.customColor);
 
-            // Map shared theme to Ultra format (as done in route)
+            // Map shared theme to Ultra format
             const ultraTheme = {
                 bg: theme.bgGradient || theme.bg,
                 border: ultraParams.customColor ? `${theme.accent}40` : 'rgba(255, 255, 255, 0.1)',
@@ -91,6 +82,8 @@ export function TemplatePreview({
                 blob2: theme.blob2
             };
 
+            // Render the REACT COMPONENT directly. 
+            // It is now a Pure SVG component, so it renders exactly as the server string.
             if (ultraParams.component === 'stat') component = <UltraStat {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'quote') component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'card') component = <UltraCard {...ultraParams} theme={ultraTheme} />;
@@ -173,9 +166,6 @@ export function TemplatePreview({
                             />
                         </div>
                     </div>
-                    {/* Direct URL Section Removed to save space or keep it? User asked for "just changing params". 
-                        The URL is still useful. Let's keep Markdown primary.
-                    */}
                 </div>
             </div>
         </div>

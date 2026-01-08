@@ -64,7 +64,7 @@ export function useTemplateGenerator() {
     const [ultraParams, setUltraParams] = useState<UltraParams>({
         component: 'stat',
         title: 'Total Users',
-        content: 'Active monthly users growing steadily',
+        content: 'Verified Creator 😊',
         icon: '🚀',
         value: '12.5k',
         label: 'Growth',

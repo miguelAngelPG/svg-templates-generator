@@ -1,102 +1,68 @@
 import React from 'react';
 
+// Reuse helper locally or import from shared utility if preferred, keeping local for now per strict component isolation
+function wrapText(text: string, maxCharsPerLine: number = 30): string[] {
+    if (!text) return [];
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = words[0];
+    for (let i = 1; i < words.length; i++) {
+        if ((currentLine + " " + words[i]).length < maxCharsPerLine) currentLine += " " + words[i];
+        else { lines.push(currentLine); currentLine = words[i]; }
+    }
+    lines.push(currentLine);
+    return lines;
+}
+
 interface UltraQuoteProps {
     content: string;
-    title: string; // Author
-    label?: string; // Role
-    icon: string; // Author Icon/Avatar substitute
+    title: string;
+    label?: string;
+    icon: string;
     theme: any;
 }
 
 export const UltraQuote: React.FC<UltraQuoteProps> = ({ content, title, label, icon, theme }) => {
+    const width = 600;
+    const height = 300;
+    const lines = wrapText(content, 35);
+
     return (
-        <div style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            background: theme.bg,
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            fontFamily: 'Outfit, sans-serif'
-        }}>
-            {/* Background Texture */}
-            <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 100% 0%, ${theme.blob1}10, transparent 50%)` }} />
+        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <style>
+                    {`
+                    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700');
+                    text { font-family: 'Outfit', sans-serif; }
+                    `}
+                </style>
+                <radialGradient id="blob1_q" cx="0.2" cy="0.2" r="0.8">
+                    <stop offset="0%" stopColor={theme.blob1} stopOpacity="0.2" />
+                    <stop offset="100%" stopColor={theme.blob1} stopOpacity="0" />
+                </radialGradient>
+            </defs>
+            <rect width="100%" height="100%" fill={theme.bg} />
+            <rect width="100%" height="100%" fill="url(#blob1_q)" />
 
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                padding: '50px',
-                width: '90%',
-                maxWidth: '700px',
-                position: 'relative'
-            }}>
-                {/* Giant Quote Mark */}
-                <div style={{
-                    position: 'absolute',
-                    top: '20px',
-                    left: '20px',
-                    fontSize: '120px',
-                    color: theme.accent,
-                    opacity: 0.1,
-                    fontFamily: 'serif',
-                    lineHeight: 0.5
-                }}>
-                    “
-                </div>
+            {/* Glass Card */}
+            <rect x="20" y="20" width={width - 40} height={height - 40} rx="20" fill="rgba(255,255,255,0.02)" stroke={theme.border} />
 
-                {/* Quote Text */}
-                <div style={{
-                    fontSize: '32px',
-                    fontWeight: 500,
-                    color: theme.text,
-                    lineHeight: 1.3,
-                    marginBottom: '30px',
-                    position: 'relative',
-                    zIndex: 1,
-                    textShadow: '0 2px 10px rgba(0,0,0,0.5)'
-                }}>
-                    {content}
-                </div>
+            {/* Quote Mark */}
+            <text x="50" y="100" fontSize="120" fill={theme.accent} opacity="0.1" fontFamily="serif">“</text>
 
-                {/* Author Block */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', paddingLeft: '10px' }}>
-                    <div style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '50%',
-                        background: `linear-gradient(135deg, ${theme.accent}, ${theme.blob1})`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        boxShadow: `0 4px 15px ${theme.accent}40`,
-                        color: '#000'
-                    }}>
-                        {icon}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontSize: '18px', color: theme.text, fontWeight: 700 }}>
-                            {title}
-                        </div>
-                        {label && (
-                            <div style={{ fontSize: '14px', color: theme.secondary, fontWeight: 400 }}>
-                                {label}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+            <g transform="translate(80, 120)">
+                {lines.map((line, i) => (
+                    <text key={i} x="0" y={i * 35} fontSize="28" fontWeight="500" fill={theme.text}>{line}</text>
+                ))}
+            </g>
 
-            {/* Decorative bottom line */}
-            <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: '20%',
-                right: '20%',
-                height: '1px',
-                background: `linear-gradient(90deg, transparent, ${theme.border}, transparent)`
-            }} />
-        </div>
+            {/* Author */}
+            <g transform="translate(80, 240)">
+                <circle cx="20" cy="0" r="20" fill={theme.accent} opacity="0.8" />
+                <text x="20" y="8" textAnchor="middle" fontSize="20" fill="#000">{icon}</text>
+                <text x="50" y="5" fontSize="18" fontWeight="700" fill={theme.text}>{title}</text>
+                {label && <text x="50" y="25" fontSize="14" fill={theme.secondary}>{label}</text>}
+            </g>
+        </svg>
     );
 };

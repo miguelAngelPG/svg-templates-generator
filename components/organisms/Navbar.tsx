@@ -18,7 +18,7 @@ export function Navbar() {
     ];
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-gray-800 bg-black/80 backdrop-blur-md">
+        <nav className="border-b border-gray-800 bg-black/80 backdrop-blur-md shrink-0">
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-white">
                     <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">

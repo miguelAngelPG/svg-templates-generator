@@ -29,7 +29,7 @@ export function TemplateSidebar({
 }: TemplateSidebarProps) {
 
     return (
-        <div className="flex flex-col gap-6 h-[calc(100vh-3rem)]">
+        <div className="flex flex-col gap-6 h-full">
             <div className="flex items-center gap-2 mb-2">
                 <LayoutTemplate className="text-cyan-400" />
                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600">

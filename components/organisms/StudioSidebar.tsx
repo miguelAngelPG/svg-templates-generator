@@ -75,7 +75,7 @@ export function StudioSidebar({
     };
 
     return (
-        <div className="flex flex-col gap-4 h-[calc(100vh-3rem)]">
+        <div className="flex flex-col gap-4 h-full overflow-y-auto pr-1">
             <div className="flex items-center gap-2 mb-2">
                 {mode === 'gif' ? <Code className="text-purple-400" /> : <ImageIcon className="text-pink-400" />}
                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">

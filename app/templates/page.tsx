@@ -19,7 +19,7 @@ export default function TemplatesPage() {
     } = useTemplateGenerator();
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 font-sans">
+        <div className="h-full bg-black text-white p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 font-sans overflow-hidden">
 
             {/* Control Panel */}
             <TemplateSidebar

@@ -7,7 +7,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export function Input({ className = '', fullWidth, ...props }: InputProps) {
     return (
         <input
-            className={`bg-[#222] rounded px-2 py-1 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none transition-colors text-white ${fullWidth ? 'w-full' : ''} ${className}`}
+            className={`bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none transition-colors text-white ${fullWidth ? 'w-full' : ''} ${className}`}
             {...props}
         />
     );

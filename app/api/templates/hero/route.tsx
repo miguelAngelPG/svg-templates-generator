@@ -6,40 +6,38 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    // Parámetros personalizables
+    // Parameters
     const name = searchParams.get('name') || 'Miguel A. Pacheco';
-    const title = searchParams.get('title') || 'Tech Lead and Architect';
-    const subtitle = searchParams.get('subtitle') || 'Human first, Engineer second';
+    const title = searchParams.get('title') || 'Tech Lead & Architect';
+    const subtitle = searchParams.get('subtitle') || 'Building digital experiences that matter.';
     const location = searchParams.get('location') || 'Hidalgo, MX';
     const lang = searchParams.get('lang') || 'es';
     const theme = searchParams.get('theme') || 'purple-cyan';
 
-    // Temas de gradientes
-    const gradients: Record<string, { blob1: string; blob2: string; blob3: string; accent: string }> = {
+    // Theme Configuration
+    const gradients: Record<string, { bg: string; accent: string; textGradient: string }> = {
       'purple-cyan': {
-        blob1: '#4316db',
-        blob2: '#00d4ff',
-        blob3: '#bd00ff',
-        accent: '#00f2ff'
+        bg: 'linear-gradient(135deg, #1a0b2e 0%, #050511 100%)',
+        accent: '#00f2ff',
+        textGradient: 'linear-gradient(90deg, #fff, #b084ff)'
       },
       'orange-pink': {
-        blob1: '#ff6b35',
-        blob2: '#f72585',
-        blob3: '#7209b7',
-        accent: '#ffaa40'
+        bg: 'linear-gradient(135deg, #2e120b 0%, #110505 100%)',
+        accent: '#ffaa40',
+        textGradient: 'linear-gradient(90deg, #fff, #ff8484)'
       },
       'green-blue': {
-        blob1: '#06ffa5',
-        blob2: '#4d47c3',
-        blob3: '#00b4d8',
-        accent: '#00ff9d'
+        bg: 'linear-gradient(135deg, #051814 0%, #020c0f 100%)',
+        accent: '#00ff9d',
+        textGradient: 'linear-gradient(90deg, #fff, #84ffcd)'
       }
     };
 
-    const currentTheme = gradients[theme] || gradients['purple-cyan'];
+    const t = gradients[theme] || gradients['purple-cyan'];
 
-    const fontData = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-700-normal.woff').then(res => res.arrayBuffer());
-    const fontDataRegular = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-400-normal.woff').then(res => res.arrayBuffer());
+    // Fonts
+    const fontData = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/files/outfit-latin-700-normal.woff').then(res => res.arrayBuffer());
+    const fontRegular = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/files/outfit-latin-400-normal.woff').then(res => res.arrayBuffer());
 
     const jsx = (
       <div
@@ -48,84 +46,93 @@ export async function GET(request: NextRequest) {
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#050505',
-          color: '#fff',
-          fontFamily: 'Inter',
+          backgroundImage: t.bg,
+          fontFamily: 'Outfit',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Background Blobs (Restored) */}
-        <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '400px', height: '400px', background: currentTheme.blob1, borderRadius: '50%', filter: 'blur(80px)', opacity: 0.4 }} />
-        <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '400px', height: '400px', background: currentTheme.blob2, borderRadius: '50%', filter: 'blur(80px)', opacity: 0.4 }} />
+        {/* Abstract Background Shapes */}
+        <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '600px', height: '600px', background: t.accent, opacity: 0.15, filter: 'blur(120px)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'white', opacity: 0.05, filter: 'blur(100px)', borderRadius: '50%' }} />
 
-        {/* Content Card (Restored Glass Effect) */}
+        {/* Glass Card */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          margin: '40px',
-          padding: '40px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '24px',
-          background: 'rgba(255, 255, 255, 0.05)', // Glass background
+          alignItems: 'flex-start',
+          justifyContent: 'center',
           width: '720px',
           height: '320px',
-          position: 'relative',
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)', // Restored shadow
+          padding: '60px',
+          borderRadius: '32px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
         }}>
-          {/* Label */}
-          <div style={{ display: 'flex', fontSize: '12px', letterSpacing: '3px', color: '#888', marginBottom: '20px', textTransform: 'uppercase' }}>
-            {lang === 'es' ? 'PERFIL PERSONAL' : 'PERSONAL PROFILE'}
+
+          {/* Top Label */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '24px',
+            opacity: 0.8
+          }}>
+            <div style={{ width: '24px', height: '2px', background: t.accent }} />
+            <span style={{ color: t.accent, fontSize: '14px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 700 }}>
+              {lang === 'es' ? 'Perfil Profesional' : 'Professional Profile'}
+            </span>
           </div>
 
           {/* Name */}
-          <div style={{
-            fontSize: '56px',
-            fontWeight: 700,
-            lineHeight: '1.1',
-            marginBottom: '20px',
-            // color: '#fff', 
-            backgroundImage: `linear-gradient(90deg, #fff, #999)`, // Restored gradient
-            backgroundClip: 'text', // Restored text clip
+          <h1 style={{
+            margin: 0,
+            fontSize: '64px',
+            fontWeight: 800,
+            lineHeight: 1.1,
+            backgroundImage: t.textGradient,
+            backgroundClip: 'text',
             color: 'transparent',
-            display: 'flex',
-            flexDirection: 'column'
+            marginBottom: '12px'
           }}>
-            <span>{name.split(' ')[0]}</span>
-            <span>{name.split(' ').slice(1).join(' ')}</span>
-          </div>
+            {name}
+          </h1>
 
           {/* Title */}
-          <div style={{ display: 'flex', fontSize: '20px', color: currentTheme.accent, fontWeight: 600, marginBottom: '10px' }}>
+          <div style={{ fontSize: '24px', color: '#e5e7eb', fontWeight: 400, marginBottom: '8px' }}>
             {title}
           </div>
 
           {/* Subtitle */}
-          <div style={{ display: 'flex', fontSize: '16px', color: 'rgba(255,255,255,0.7)', fontWeight: 400 }}>
+          <div style={{ fontSize: '16px', color: '#9ca3af', fontWeight: 400, maxWidth: '500px' }}>
             {subtitle}
           </div>
 
-          {/* Accent Line */}
-          <div style={{ position: 'absolute', left: '40px', bottom: '100px', width: '150px', height: '2px', background: `linear-gradient(90deg, ${currentTheme.accent}, transparent)` }} />
-
-          {/* Location Badge */}
+          {/* Location Badge (Bottom Right) */}
           <div style={{
             position: 'absolute',
             bottom: '40px',
-            left: '40px',
+            right: '40px',
             display: 'flex',
             alignItems: 'center',
+            gap: '6px',
             padding: '8px 16px',
-            borderRadius: '20px',
-            background: 'rgba(255,255,255,0.05)',
+            background: 'rgba(0,0,0,0.3)',
+            borderRadius: '100px',
             border: '1px solid rgba(255,255,255,0.1)',
             fontSize: '12px',
-            color: 'rgba(255,255,255,0.8)'
+            color: '#d1d5db'
           }}>
-            📍 {location}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" color={t.accent}>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            {location}
           </div>
+
         </div>
       </div>
     );
@@ -134,45 +141,20 @@ export async function GET(request: NextRequest) {
       width: 800,
       height: 400,
       fonts: [
-        {
-          name: 'Inter',
-          data: fontData,
-          weight: 700,
-          style: 'normal',
-        },
-        {
-          name: 'Inter',
-          data: fontDataRegular,
-          weight: 400,
-          style: 'normal',
-        },
+        { name: 'Outfit', data: fontData, weight: 700, style: 'normal' },
+        { name: 'Outfit', data: fontRegular, weight: 400, style: 'normal' },
       ],
     });
 
     return new Response(svg, {
       headers: {
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
       },
     });
+
   } catch (error) {
     console.error('Error generating Hero SVG:', error);
-
-    // Return Error SVG
-    const errorSvg = `
-      <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-        <rect width="800" height="400" fill="#111"/>
-        <text x="400" y="200" text-anchor="middle" fill="#ff4444" font-family="monospace" font-size="16">
-          Error: ${error instanceof Error ? error.message : 'Unknown Error'}
-        </text>
-      </svg>
-    `;
-
-    return new Response(errorSvg, {
-      headers: {
-        'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'no-store',
-      },
-    });
+    return new Response(`<svg><text>Error</text></svg>`, { headers: { 'Content-Type': 'image/svg+xml' } });
   }
 }

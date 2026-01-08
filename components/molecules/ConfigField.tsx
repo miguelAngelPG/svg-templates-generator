@@ -12,7 +12,7 @@ interface ConfigFieldProps {
 
 export function ConfigField({ label, value, onChange, type = 'text', suffix }: ConfigFieldProps) {
     return (
-        <div className="flex-1">
+        <div className="">
             <Label>{label}</Label>
             <div className="flex gap-2 items-center">
                 <Input

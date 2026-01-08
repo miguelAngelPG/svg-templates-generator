@@ -1,10 +1,12 @@
 import React from 'react';
-import { Code, FileVideo, Settings } from 'lucide-react';
+import { Code, FileVideo, Settings, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import { CodeEditor } from '../molecules/CodeEditor';
 import { Input } from '../atoms/Input';
 
 interface StudioSidebarProps {
+    mode?: 'gif' | 'svg'; // NEW PROP
+
     html: string;
     setHtml: (val: string) => void;
     css: string;
@@ -13,12 +15,15 @@ interface StudioSidebarProps {
     setWidth: (val: number) => void;
     height: number;
     setHeight: (val: number) => void;
-    duration: number;
-    setDuration: (val: number) => void;
-    fps: number;
-    setFps: (val: number) => void;
     bg: string;
     setBg: (val: string) => void;
+
+    // GIF Specific (Optional in SVG mode)
+    duration?: number;
+    setDuration?: (val: number) => void;
+    fps?: number;
+    setFps?: (val: number) => void;
+
     onGenerate: () => void;
     isLoading: boolean;
     status: string;
@@ -33,12 +38,13 @@ const QUALITY_PRESETS = [
 ];
 
 export function StudioSidebar({
+    mode = 'gif',
     html, setHtml,
     css, setCss,
     width, setWidth,
     height, setHeight,
-    duration, setDuration,
-    fps, setFps,
+    duration = 3, setDuration,
+    fps = 30, setFps,
     bg, setBg,
     onGenerate,
     isLoading,
@@ -52,7 +58,7 @@ export function StudioSidebar({
 
     const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const idx = Number(e.target.value);
-        if (idx >= 0) {
+        if (idx >= 0 && setDuration && setFps) {
             const preset = QUALITY_PRESETS[idx];
             setDuration(preset.duration);
             setFps(preset.fps);
@@ -60,6 +66,9 @@ export function StudioSidebar({
     };
 
     const getButtonLabel = () => {
+        if (mode === 'svg') {
+            return isLoading ? 'Generating SVG...' : 'Generate SVG';
+        }
         if (status === 'starting') return 'Starting Engine...';
         if (status === 'processing') return `Rendering ${progress}%`;
         return 'Generate GIF';
@@ -68,9 +77,9 @@ export function StudioSidebar({
     return (
         <div className="flex flex-col gap-4 h-[calc(100vh-3rem)]">
             <div className="flex items-center gap-2 mb-2">
-                <Code className="text-purple-400" />
+                {mode === 'gif' ? <Code className="text-purple-400" /> : <ImageIcon className="text-pink-400" />}
                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-                    GIF Studio
+                    {mode === 'gif' ? 'GIF Studio' : 'SVG Generator'}
                 </h1>
             </div>
 
@@ -87,26 +96,35 @@ export function StudioSidebar({
                         <Input type="number" value={height} onChange={e => setHeight(Number(e.target.value))} fullWidth />
                     </div>
                 </div>
-                <div>
-                    <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
-                        <Settings className="w-3 h-3" /> Duration & Quality
-                    </label>
-                    <div className="flex flex-col gap-1">
-                        <select
-                            className="bg-[#222] rounded px-2 py-1 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full"
-                            onChange={handlePresetChange}
-                            value={currentPreset ? QUALITY_PRESETS.indexOf(currentPreset) : -1}
-                        >
-                            {isCustom && <option value={-1}>Custom ({duration}s / {fps}fps)</option>}
-                            {QUALITY_PRESETS.map((p, i) => (
-                                <option key={i} value={i}>{p.label}</option>
-                            ))}
-                        </select>
-                        <div className="text-[10px] text-gray-500 font-mono text-center">
-                            ~{duration * fps} frames total
+
+                {/* TIMING CONTROL (ONLY FOR GIF) */}
+                {mode === 'gif' && setDuration && setFps ? (
+                    <div>
+                        <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                            <Settings className="w-3 h-3" /> Duration & Quality
+                        </label>
+                        <div className="flex flex-col gap-1">
+                            <select
+                                className="bg-[#222] rounded px-2 py-1 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full"
+                                onChange={handlePresetChange}
+                                value={currentPreset ? QUALITY_PRESETS.indexOf(currentPreset) : -1}
+                            >
+                                {isCustom && <option value={-1}>Custom ({duration}s / {fps}fps)</option>}
+                                {QUALITY_PRESETS.map((p, i) => (
+                                    <option key={i} value={i}>{p.label}</option>
+                                ))}
+                            </select>
+                            <div className="text-[10px] text-gray-500 font-mono text-center">
+                                ~{duration * fps} frames total
+                            </div>
                         </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="flex items-center justify-center text-gray-600 text-xs italic">
+                        Static SVG (No Timing)
+                    </div>
+                )}
+
                 <div>
                     <label className="block text-xs text-gray-500 mb-1">Background</label>
                     <div className="flex gap-2 items-center">
@@ -120,10 +138,11 @@ export function StudioSidebar({
                 onClick={onGenerate}
                 isLoading={isLoading}
                 loadingText={getButtonLabel()}
-                icon={<FileVideo className="w-5 h-5" />}
+                icon={mode === 'gif' ? <FileVideo className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
                 className="w-full"
+                variant={mode === 'svg' ? 'primary' : 'primary'} // can customize color later
             >
-                Generate GIF
+                {getButtonLabel()}
             </Button>
         </div>
     );

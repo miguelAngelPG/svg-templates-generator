@@ -4,8 +4,8 @@ import React from 'react';
 
 async function getFonts() {
   const [regular, bold] = await Promise.all([
-    fetch('https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.0.18/files/noto-sans-latin-400-normal.woff').then((res) => res.arrayBuffer()),
-    fetch('https://cdn.jsdelivr.net/npm/@fontsource/noto-sans@5.0.18/files/noto-sans-latin-700-normal.woff').then((res) => res.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/files/outfit-latin-400-normal.woff').then((res) => res.arrayBuffer()),
+    fetch('https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/files/outfit-latin-700-normal.woff').then((res) => res.arrayBuffer()),
   ]);
 
   return { regular, bold };
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
+    // Params
     const component = searchParams.get('component') || 'card';
     const width = parseInt(searchParams.get('width') || '600');
     const height = parseInt(searchParams.get('height') || '300');
@@ -26,87 +27,134 @@ export async function GET(request: NextRequest) {
     const value = searchParams.get('value') || '100';
     const label = searchParams.get('label') || 'Label';
 
+    // Enhanced Themes V2
     const themes: Record<string, any> = {
       'purple-cyan': {
-        bg: '#050505',
+        bg: 'linear-gradient(135deg, #0f0a1e 0%, #000000 100%)',
         glass: 'rgba(255, 255, 255, 0.03)',
         border: 'rgba(255, 255, 255, 0.1)',
         text: '#ffffff',
-        secondary: '#999999',
+        secondary: '#94a3b8',
         accent: '#00f2ff',
-        gradient1: '#4316db',
-        gradient2: '#00d4ff',
+        blob1: '#4316db',
+        blob2: '#00d4ff',
       },
       'orange-warm': {
-        bg: '#0a0505',
-        glass: 'rgba(255, 170, 64, 0.05)',
+        bg: 'linear-gradient(135deg, #1f0f0a 0%, #000000 100%)',
+        glass: 'rgba(255, 255, 255, 0.03)',
         border: 'rgba(255, 170, 64, 0.15)',
         text: '#ffffff',
-        secondary: '#b89968',
+        secondary: '#d6c0a0',
         accent: '#ffaa40',
-        gradient1: '#ff6b35',
-        gradient2: '#ffaa40',
+        blob1: '#ff6b35',
+        blob2: '#ffaa40',
       },
       'green-fresh': {
-        bg: '#030a08',
-        glass: 'rgba(0, 255, 157, 0.03)',
+        bg: 'linear-gradient(135deg, #05140f 0%, #000000 100%)',
+        glass: 'rgba(255, 255, 255, 0.03)',
         border: 'rgba(0, 255, 157, 0.1)',
         text: '#ffffff',
-        secondary: '#66b894',
+        secondary: '#94b8a8',
         accent: '#00ff9d',
-        gradient1: '#06ffa5',
-        gradient2: '#00ff9d',
+        blob1: '#06ffa5',
+        blob2: '#00ff9d',
       },
     };
 
     const t = themes[theme] || themes['purple-cyan'];
 
+    // Common Glass Style
+    const glassStyle = {
+      background: t.glass,
+      border: `1px solid ${t.border}`,
+      borderRadius: '24px',
+      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.6)',
+      backdropFilter: 'blur(10px)', // Note: Satori support for blur is limited but good to have
+    };
+
     const components: Record<string, any> = {
-      card: (
-        <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: t.bg, position: 'relative' }}>
-          <div style={{ position: 'absolute', width: '300px', height: '300px', background: `radial-gradient(circle, ${t.gradient1}40 0%, transparent 70%)`, top: '-50px', left: '-50px', filter: 'blur(60px)' }} />
-          <div style={{ position: 'absolute', width: '250px', height: '250px', background: `radial-gradient(circle, ${t.gradient2}30 0%, transparent 70%)`, bottom: '-30px', right: '-30px', filter: 'blur(60px)' }} />
-          <div style={{ display: 'flex', flexDirection: 'column', margin: '30px', padding: '40px', background: t.glass, border: `1px solid ${t.border}`, borderRadius: '20px', position: 'relative' }}>
-            <div style={{ display: 'flex', fontSize: '48px', marginBottom: '20px' }}>{icon}</div>
-            <div style={{ display: 'flex', fontSize: '32px', fontWeight: 'bold', color: t.text, marginBottom: '15px' }}>{title}</div>
-            <div style={{ display: 'flex', fontSize: '18px', color: t.secondary, lineHeight: 1.6 }}>{content}</div>
-            <div style={{ display: 'flex', width: '80px', height: '3px', background: t.accent, marginTop: '25px', borderRadius: '2px' }} />
-          </div>
-        </div>
-      ),
 
-      quote: (
-        <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          <div style={{ position: 'absolute', width: '100%', height: '100%', background: `radial-gradient(ellipse at center, ${t.accent}10 0%, transparent 60%)` }} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '50px', maxWidth: '90%', position: 'relative' }}>
-            <div style={{ position: 'absolute', left: '0', top: '40px', bottom: '40px', width: '4px', background: t.accent, borderRadius: '2px' }} />
-            <div style={{ display: 'flex', fontSize: '64px', color: t.accent, opacity: 0.3, marginBottom: '20px', marginLeft: '20px' }}>"</div>
-            <div style={{ display: 'flex', fontSize: '28px', fontStyle: 'italic', color: t.text, lineHeight: 1.5, marginLeft: '20px' }}>{content}</div>
-            <div style={{ display: 'flex', fontSize: '16px', color: t.secondary, marginTop: '20px', marginLeft: '20px' }}>— {title}</div>
-          </div>
-        </div>
-      ),
-
+      // 1. STAT CARD
       stat: (
-        <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          <div style={{ position: 'absolute', width: '100%', height: '100%', background: `linear-gradient(135deg, ${t.gradient1}15 0%, ${t.gradient2}08 100%)` }} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', position: 'relative' }}>
-            <div style={{ display: 'flex', fontSize: '56px', marginBottom: '25px' }}>{icon}</div>
-            <div style={{ display: 'flex', fontSize: '96px', fontWeight: 'bold', color: t.text, marginBottom: '10px' }}>{value}</div>
-            <div style={{ display: 'flex', fontSize: '24px', color: t.accent, fontWeight: '600', letterSpacing: '2px', textTransform: 'uppercase' }}>{label}</div>
-            {content && <div style={{ display: 'flex', fontSize: '16px', color: t.secondary, marginTop: '15px' }}>{content}</div>}
+        <div style={{ width: '100%', height: '100%', display: 'flex', background: t.bg, alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          {/* Background Blobs */}
+          <div style={{ position: 'absolute', top: '-50%', left: '-20%', width: '500px', height: '500px', background: t.blob1, filter: 'blur(80px)', opacity: 0.2, borderRadius: '50%' }} />
+          <div style={{ position: 'absolute', bottom: '-50%', right: '-20%', width: '500px', height: '500px', background: t.blob2, filter: 'blur(80px)', opacity: 0.2, borderRadius: '50%' }} />
+
+          <div style={{ ...glassStyle, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px', minWidth: '300px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px', filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.2))' }}>{icon}</div>
+            <div style={{ fontSize: '72px', fontWeight: 800, color: t.text, lineHeight: 1, marginBottom: '8px', letterSpacing: '-2px' }}>{value}</div>
+            <div style={{ fontSize: '18px', color: t.accent, fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}>{label}</div>
+            {content && <div style={{ fontSize: '14px', color: t.secondary, marginTop: '16px', maxWidth: '250px', textAlign: 'center' }}>{content}</div>}
           </div>
         </div>
       ),
 
-      badge: (
-        <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '25px 40px', background: t.glass, border: `2px solid ${t.border}`, borderRadius: '50px' }}>
-            <div style={{ display: 'flex', fontSize: '40px' }}>{icon}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <div style={{ display: 'flex', fontSize: '28px', fontWeight: 'bold', color: t.text }}>{title}</div>
-              <div style={{ display: 'flex', fontSize: '16px', color: t.accent }}>{content}</div>
+      // 2. QUOTE CARD
+      quote: (
+        <div style={{ width: '100%', height: '100%', display: 'flex', background: t.bg, alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 50% 0%, ${t.blob1}20, transparent 70%)` }} />
+
+          <div style={{ ...glassStyle, display: 'flex', flexDirection: 'column', padding: '60px', maxWidth: '85%' }}>
+            <div style={{ fontSize: '80px', color: t.accent, opacity: 0.2, fontFamily: 'serif', lineHeight: 0.5, marginBottom: '24px' }}>“</div>
+            <div style={{ fontSize: '28px', fontWeight: 400, color: t.text, lineHeight: 1.4, marginBottom: '32px' }}>{content}</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '40px', height: '2px', background: t.accent }} />
+              <div style={{ fontSize: '16px', color: t.secondary, fontWeight: 700, letterSpacing: '1px' }}>{title}</div>
             </div>
+          </div>
+        </div>
+      ),
+
+      // 3. FEATURE CARD
+      card: (
+        <div style={{ width: '100%', height: '100%', display: 'flex', background: t.bg, alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '10%', right: '10%', width: '300px', height: '300px', background: t.blob2, filter: 'blur(100px)', opacity: 0.15, borderRadius: '50%' }} />
+
+          <div style={{ ...glassStyle, display: 'flex', flexDirection: 'column', padding: '48px', width: '80%', position: 'relative' }}>
+            <div style={{
+              position: 'absolute', top: '24px', left: '24px',
+              width: '48px', height: '48px',
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '24px',
+              border: `1px solid ${t.border}`
+            }}>
+              {icon}
+            </div>
+
+            <div style={{ marginTop: '60px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ fontSize: '32px', fontWeight: 700, color: t.text }}>{title}</div>
+              <div style={{ fontSize: '18px', color: t.secondary, lineHeight: 1.5 }}>{content}</div>
+            </div>
+
+            <div style={{ marginTop: 'auto', paddingTop: '32px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: t.accent, fontWeight: 600 }}>
+              Learn more <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </div>
+          </div>
+        </div>
+      ),
+
+      // 4. BADGE
+      badge: (
+        <div style={{ width: '100%', height: '100%', display: 'flex', background: 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '20px',
+            padding: '16px 32px',
+            background: '#111',
+            border: `1px solid ${t.border}`,
+            borderRadius: '100px',
+            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.5)'
+          }}>
+            <div style={{ fontSize: '28px' }}>{icon}</div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontSize: '20px', fontWeight: 700, color: t.text }}>{title}</div>
+              {content && <div style={{ fontSize: '13px', color: t.secondary }}>{content}</div>}
+            </div>
+            <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.1)', margin: '0 8px' }} />
+            <div style={{ fontSize: '16px', fontWeight: 700, color: t.accent }}>{value}</div>
           </div>
         </div>
       ),
@@ -119,8 +167,8 @@ export async function GET(request: NextRequest) {
       width,
       height,
       fonts: [
-        { name: 'Noto Sans', data: fonts.regular, weight: 400, style: 'normal' },
-        { name: 'Noto Sans', data: fonts.bold, weight: 700, style: 'normal' },
+        { name: 'Outfit', data: fonts.regular, weight: 400, style: 'normal' },
+        { name: 'Outfit', data: fonts.bold, weight: 700, style: 'normal' },
       ],
     });
 
@@ -133,20 +181,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Error:', error);
-
-    const errorSvg = `
-<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
-  <rect width="600" height="300" fill="#1a1a1a"/>
-  <text x="300" y="150" text-anchor="middle" fill="#ff4444" font-size="20">
-    Error: ${error instanceof Error ? error.message.substring(0, 40) : 'Unknown'}
-  </text>
-</svg>
-    `;
-
-    return new Response(errorSvg, {
-      headers: {
-        'Content-Type': 'image/svg+xml',
-      },
-    });
+    const errorSvg = `<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="300" fill="#111"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f87171" font-family="sans-serif">Error Generating Template</text></svg>`;
+    return new Response(errorSvg, { headers: { 'Content-Type': 'image/svg+xml' } });
   }
 }

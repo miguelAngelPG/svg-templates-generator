@@ -188,11 +188,11 @@ export function getTheme(themeName: string, customColor?: string, customColor2?:
 
         return {
             bg: '#0a0a0a',
-            bgGradient: 'linear-gradient(135deg, #0a0a0a 0%, #000 100%)',
+            bgGradient: `linear-gradient(135deg, ${customColor}40 0%, ${secondary}40 100%)`, // Gradient between both custom colors
             accent: customColor,
-            gradient: `linear-gradient(135deg, ${customColor} 0%, ${secondary} 100%)`, // Diagonal gradient is more visible
+            gradient: `linear-gradient(135deg, ${customColor} 0%, ${secondary} 100%)`,
             blob1: customColor,
-            blob2: secondary // Always use secondary if provided
+            blob2: secondary
         };
     }
 

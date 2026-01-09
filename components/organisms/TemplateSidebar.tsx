@@ -379,6 +379,24 @@ export function TemplateSidebar({
                             <Select value={stackParams.theme} onChange={e => setStackParams({ ...stackParams, theme: e.target.value })} fullWidth>
                                 {renderThemeOptions()}
                             </Select>
+
+                            <div className="flex items-center justify-between mt-3 p-2 bg-[#1a1a1a] rounded border border-gray-800">
+                                <span className="text-xs text-gray-300 font-medium">Fondo Transparente</span>
+                                <button
+                                    onClick={() => setStackParams({ ...stackParams, bgTransparent: !stackParams.bgTransparent })}
+                                    className={`
+                                        w-10 h-5 rounded-full relative transition-colors duration-200 focus:outline-none
+                                        ${stackParams.bgTransparent ? 'bg-purple-600' : 'bg-gray-700'}
+                                    `}
+                                >
+                                    <div
+                                        className={`
+                                            w-3 h-3 rounded-full bg-white absolute top-1 transition-transform duration-200
+                                            ${stackParams.bgTransparent ? 'left-6' : 'left-1'}
+                                        `}
+                                    />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Custom Icon Color */}
@@ -451,6 +469,6 @@ export function TemplateSidebar({
                 )}
 
             </div>
-        </div>
+        </div >
     );
 }

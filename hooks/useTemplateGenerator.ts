@@ -45,6 +45,7 @@ export interface StackParams {
     iconStyle: 'original' | 'monochrome' | 'glass' | 'custom';
     iconColor: string;
     gap: number;
+    bgTransparent?: boolean;
 }
 
 export function useTemplateGenerator() {
@@ -95,7 +96,8 @@ export function useTemplateGenerator() {
         customColor2: '#ffffff',
         iconStyle: 'original',
         iconColor: '#ffffff',
-        gap: 16
+        gap: 16,
+        bgTransparent: false
     });
 
     // Debounced Generation
@@ -111,7 +113,6 @@ export function useTemplateGenerator() {
                 p.append('content', advancedParams.content);
                 p.append('subtitle', advancedParams.subtitle);
                 p.append('width', String(advancedParams.width));
-                p.append('height', String(advancedParams.height));
                 p.append('height', String(advancedParams.height));
                 p.append('theme', advancedParams.theme);
                 p.append('layout', advancedParams.layout);
@@ -169,6 +170,7 @@ export function useTemplateGenerator() {
                 p.append('iconStyle', stackParams.iconStyle);
                 p.append('iconColor', stackParams.iconColor.replace('#', '')); // Send without hash
                 p.append('gap', String(stackParams.gap));
+                if (stackParams.bgTransparent) p.append('bgTransparent', 'true');
 
                 if (stackParams.theme === 'custom') {
                     p.append('customColor', stackParams.customColor || '#8855ff');

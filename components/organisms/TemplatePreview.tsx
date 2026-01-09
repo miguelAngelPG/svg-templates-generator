@@ -105,9 +105,11 @@ export function TemplatePreview({
                 <TechStackRow
                     technologies={stackParams.technologies}
                     theme={theme}
+                    themeName={stackParams.theme}
                     iconStyle={stackParams.iconStyle}
                     iconColor={stackParams.iconColor}
                     gap={stackParams.gap}
+                    bgTransparent={stackParams.bgTransparent}
                 />
             );
         }

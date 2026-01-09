@@ -3,17 +3,21 @@ import React, { useEffect, useState } from 'react';
 interface TechStackRowProps {
     technologies: string[];
     theme: any; // Theme object
+    themeName?: string;
     iconStyle: 'original' | 'monochrome' | 'glass' | 'custom';
     iconColor?: string; // Hex code with hash
     gap: number;
+    bgTransparent?: boolean;
 }
 
 export const TechStackRow: React.FC<TechStackRowProps> = ({
     technologies,
     theme,
+    themeName,
     iconStyle,
     iconColor,
-    gap
+    gap,
+    bgTransparent
 }) => {
     // We need to fetch the SVG content for the icons to render them properly
     // mirroring the API behavior.
@@ -62,7 +66,9 @@ export const TechStackRow: React.FC<TechStackRowProps> = ({
         >
             {/* Glass Background (Optional) */}
             {/* Glass Background or Custom Theme BG */}
-            {(iconStyle === 'glass' || (theme.bgGradient && iconStyle !== 'original')) && (
+            {/* Glass Background or Custom Theme BG */}
+            {/* Render background UNLESS transparent mode is requested */}
+            {!bgTransparent && (iconStyle === 'glass' || theme.bgGradient) && (
                 <div
                     style={{
                         position: 'absolute',

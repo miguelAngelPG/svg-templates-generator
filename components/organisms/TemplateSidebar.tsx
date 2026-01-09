@@ -4,7 +4,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
 import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
@@ -24,6 +24,9 @@ interface TemplateSidebarProps {
 
     stackParams: StackParams;
     setStackParams: (val: StackParams) => void;
+
+    socialParams: SocialParams;
+    setSocialParams: (val: SocialParams) => void;
 }
 
 export function TemplateSidebar({
@@ -31,7 +34,8 @@ export function TemplateSidebar({
     advancedParams, setAdvancedParams,
     heroParams, setHeroParams,
     ultraParams, setUltraParams,
-    stackParams, setStackParams
+    stackParams, setStackParams,
+    socialParams, setSocialParams
 }: TemplateSidebarProps) {
 
     // Helper to render theme options dynamically
@@ -68,6 +72,7 @@ export function TemplateSidebar({
                     <option value="hero">Hero Section (Profile)</option>
                     <option value="ultra">Ultra Components (Stats)</option>
                     <option value="stack">Tech Stack (By Readme Forge)</option>
+                    <option value="social">Social Hub (Connect)</option>
                 </Select>
             </div>
 
@@ -457,6 +462,156 @@ export function TemplateSidebar({
                                             type="text"
                                             value={stackParams.customColor2 || '#ffffff'}
                                             onChange={e => setStackParams({ ...stackParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Social Configuration */}
+                {selectedTemplate === 'social' && (
+                    <>
+                        <div className="bg-[#111] p-3 rounded border border-gray-800 mb-4">
+                            <Label>Platforms & Usernames</Label>
+                            <p className="text-[10px] text-gray-500 mb-2">
+                                Uses <a href="https://simpleicons.org/" target="_blank" className="underline hover:text-white">Simple Icons</a> slugs (e.g. twitter, github, linkedin).
+                            </p>
+
+                            <datalist id="social-providers">
+                                <option value="github" />
+                                <option value="twitter" />
+                                <option value="x" />
+                                <option value="linkedin" />
+                                <option value="instagram" />
+                                <option value="facebook" />
+                                <option value="youtube" />
+                                <option value="twitch" />
+                                <option value="discord" />
+                                <option value="tiktok" />
+                                <option value="medium" />
+                                <option value="devdotto" />
+                                <option value="dribbble" />
+                                <option value="behance" />
+                                <option value="stackoverflow" />
+                                <option value="reddit" />
+                                <option value="mailto" />
+                            </datalist>
+
+                            <div className="flex flex-col gap-2 mb-2">
+                                {socialParams.platforms.map((p, index) => (
+                                    <div key={index} className="flex gap-2 items-center">
+                                        <div className="w-1/3">
+                                            <Input
+                                                value={p.provider}
+                                                onChange={(e) => {
+                                                    const newPlatforms = [...socialParams.platforms];
+                                                    newPlatforms[index].provider = e.target.value;
+                                                    setSocialParams({ ...socialParams, platforms: newPlatforms });
+                                                }}
+                                                placeholder="Provider"
+                                                className="h-8 text-[11px]"
+                                                fullWidth
+                                                list="social-providers"
+                                            />
+                                        </div>
+                                        <div className="w-1/2">
+                                            <Input
+                                                value={p.username}
+                                                onChange={(e) => {
+                                                    const newPlatforms = [...socialParams.platforms];
+                                                    newPlatforms[index].username = e.target.value;
+                                                    setSocialParams({ ...socialParams, platforms: newPlatforms });
+                                                }}
+                                                placeholder="Username"
+                                                className="h-8 text-[11px]"
+                                                fullWidth
+                                            />
+                                        </div>
+                                        <button
+                                            // Delete specific index
+                                            onClick={() => {
+                                                const newPlatforms = socialParams.platforms.filter((_, i) => i !== index);
+                                                setSocialParams({ ...socialParams, platforms: newPlatforms });
+                                            }}
+                                            className="text-red-500 hover:text-red-400 p-1"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    setSocialParams({
+                                        ...socialParams,
+                                        platforms: [...socialParams.platforms, { provider: '', username: '' }]
+                                    });
+                                }}
+                                className="w-full py-1 text-xs bg-[#1a1a1a] border border-gray-700 rounded text-gray-300 hover:text-white hover:border-gray-500 transition-colors"
+                            >
+                                + Add Platform
+                            </button>
+                        </div>
+
+                        <div className="mb-4">
+                            <Label>Style</Label>
+                            <Select value={socialParams.style} onChange={e => setSocialParams({ ...socialParams, style: e.target.value as any })} fullWidth>
+                                <option value="badge">Badge Pills</option>
+                                <option value="card">Profile Card</option>
+                                <option value="icon-only">Icon Only Row</option>
+                                <option value="block">Link Block (Linktree)</option>
+                                <option value="minimal">Minimal List</option>
+                                <option value="glass-grid">Glass Grid</option>
+                            </Select>
+                        </div>
+
+                        <div className="mt-2">
+                            <Label>Theme</Label>
+                            <Select value={socialParams.theme} onChange={e => setSocialParams({ ...socialParams, theme: e.target.value })} fullWidth>
+                                {renderThemeOptions()}
+                            </Select>
+                        </div>
+
+                        {socialParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={socialParams.customColor || '#8855ff'}
+                                            onChange={e => setSocialParams({ ...socialParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={socialParams.customColor || '#8855ff'}
+                                            onChange={e => setSocialParams({ ...socialParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={socialParams.customColor2 || '#ffffff'}
+                                            onChange={e => setSocialParams({ ...socialParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={socialParams.customColor2 || '#ffffff'}
+                                            onChange={e => setSocialParams({ ...socialParams, customColor2: e.target.value })}
                                             fullWidth
                                             maxLength={7}
                                             className="text-xs"

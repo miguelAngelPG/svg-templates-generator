@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social';
 
 export interface AdvancedParams {
     content: string;
@@ -46,6 +46,14 @@ export interface StackParams {
     iconColor: string;
     gap: number;
     bgTransparent?: boolean;
+}
+
+export interface SocialParams {
+    platforms: { provider: string; username: string }[];
+    style: 'icon-only' | 'badge' | 'card' | 'block' | 'minimal' | 'glass-grid';
+    theme: string;
+    customColor: string;
+    customColor2: string;
 }
 
 export function useTemplateGenerator() {
@@ -98,6 +106,18 @@ export function useTemplateGenerator() {
         iconColor: '#ffffff',
         gap: 16,
         bgTransparent: false
+    });
+
+    const [socialParams, setSocialParams] = useState<SocialParams>({
+        platforms: [
+            { provider: 'github', username: 'github' },
+            { provider: 'twitter', username: 'twitter' },
+            { provider: 'linkedin', username: '' }
+        ],
+        style: 'badge',
+        theme: 'purple-cyan',
+        customColor: '#8855ff',
+        customColor2: '#ffffff'
     });
 
     // Debounced Generation
@@ -180,6 +200,27 @@ export function useTemplateGenerator() {
                 }
 
                 url = `/api/custom/stack?${p.toString()}&t=${Date.now()}`;
+            } else if (selectedTemplate === 'social') {
+                const p = new URLSearchParams();
+                // Serialize platforms as provider:username,provider:username
+                // Serialize platforms as provider:username
+                // ALLOW platform with empty username for preview purposes! 
+                // The API should handle empty usernames gracefully (showing just provider name)
+                const validPlatforms = socialParams.platforms.filter(p => p.provider.trim() !== '');
+                const platformString = validPlatforms.map(pt => `${pt.provider}:${pt.username}`).join(',');
+
+                p.append('platforms', platformString);
+                p.append('style', socialParams.style);
+                p.append('theme', socialParams.theme);
+
+                if (socialParams.theme === 'custom') {
+                    p.append('customColor', socialParams.customColor || '#8855ff');
+                    const c2 = socialParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/custom/social?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
@@ -188,7 +229,7 @@ export function useTemplateGenerator() {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams]);
 
     return {
         selectedTemplate,
@@ -199,6 +240,7 @@ export function useTemplateGenerator() {
         advancedParams, setAdvancedParams,
         heroParams, setHeroParams,
         ultraParams, setUltraParams,
-        stackParams, setStackParams
+        stackParams, setStackParams,
+        socialParams, setSocialParams
     };
 }

@@ -5,6 +5,7 @@ export type ThemeColors = {
     gradient: string;
     blob1: string;
     blob2: string;
+    border?: string;
 };
 
 export const HERO_THEMES: Record<string, ThemeColors> = {

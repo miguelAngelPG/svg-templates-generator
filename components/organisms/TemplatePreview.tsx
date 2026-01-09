@@ -16,7 +16,7 @@ import { UltraBadge } from '../templates/ultra/UltraBadge';
 import { TechStackRow } from '../templates/stack/TechStackRow';
 
 import { getTheme } from '@/utils/themes';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -28,6 +28,7 @@ interface TemplatePreviewProps {
     heroParams: HeroParams;
     ultraParams: UltraParams;
     stackParams: StackParams;
+    socialParams: SocialParams;
 }
 
 export function TemplatePreview({
@@ -37,7 +38,8 @@ export function TemplatePreview({
     advancedParams,
     heroParams,
     ultraParams,
-    stackParams
+    stackParams,
+    socialParams
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
@@ -91,14 +93,10 @@ export function TemplatePreview({
             else if (ultraParams.component === 'quote') component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'card') component = <UltraCard {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'badge') component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
-            if (ultraParams.component === 'stat') component = <UltraStat {...ultraParams} theme={ultraTheme} />;
-            else if (ultraParams.component === 'quote') component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
-            else if (ultraParams.component === 'card') component = <UltraCard {...ultraParams} theme={ultraTheme} />;
-            else if (ultraParams.component === 'badge') component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
         }
         else if (templateName === 'stack') {
-            width: 800; // flexible container
-            height: 100;
+            width = 800; // flexible container
+            height = 100;
             const theme = getTheme(stackParams.theme, stackParams.customColor, stackParams.customColor2);
 
             component = (
@@ -113,10 +111,29 @@ export function TemplatePreview({
                 />
             );
         }
+        else if (templateName === 'social') {
+            width = 800;
+            height = socialParams.style === 'card' ? 400 : 100;
+
+            // For Social, we rely on the API generation for now as it handles complex icon fetching/masking
+            component = (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {isLoading ? (
+                        <span className="text-gray-500 text-xs animate-pulse">Generating Social Hub...</span>
+                    ) : (
+                        <img
+                            src={generatedUrl}
+                            alt="Social Hub Preview"
+                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                        />
+                    )}
+                </div>
+            );
+        }
 
         return { component, width, height };
 
-    }, [templateName, advancedParams, heroParams, ultraParams, stackParams]);
+    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, generatedUrl, isLoading]);
 
     return (
         <div className="flex flex-col gap-6 h-full">

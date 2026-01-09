@@ -14,52 +14,52 @@ export default function Home() {
         {/* Compact Hero Section */}
         <section className="text-center relative z-10 shrink-0">
           <span className="inline-block py-1 px-3 rounded-full bg-purple-900/30 border border-purple-700/50 text-purple-300 text-[10px] font-mono mb-4">
-            v2.0 NOW WITH ATOMIC ARCHITECTURE
+            v2.0 • GITHUB PROFILE TOOLKIT
           </span>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
-            Templates Chonchos
+            Readme Forge
           </h1>
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-6 leading-relaxed">
-            The ultimate toolkit for developers. Generate <span className="text-purple-400">GIFs</span>, <span className="text-pink-400">SVGs</span>, and <span className="text-cyan-400">Profile Templates</span> in seconds with real-time preview.
+            Craft the perfect developer profile. A curated catalog of <span className="text-purple-400">Dynamic Stats</span>, <span className="text-pink-400">SVG Widgets</span>, and <span className="text-cyan-400">Custom Badges</span> for your GitHub Readme.
           </p>
 
           <div className="flex justify-center gap-4">
-            <a href="/gif-studio" className="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm">
-              Launch Studio
+            <a href="/templates" className="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm">
+              Explore Catalog
             </a>
             <a href="https://github.com" target="_blank" className="px-6 py-3 bg-[#111] border border-gray-800 text-white font-medium rounded-lg hover:border-gray-600 transition-colors text-sm">
-              View on GitHub
+              Star on GitHub
             </a>
           </div>
         </section>
 
         {/* Features Grid - No huge vertical padding */}
         <section className="width-full relative z-10 shrink-0">
-          <h2 className="text-xl font-bold mb-6 text-center text-gray-200">What do you want to create?</h2>
+          <h2 className="text-xl font-bold mb-6 text-center text-gray-200">Catalog Categories</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FeatureCard
               title="GIF Studio"
-              description="Create high-performance animated GIFs using our serverless worker engine. Live preview, customizable timing, and optimized encoding."
+              description="Frame-by-frame animation engine. Create custom loading states and animated headers."
               icon={<Play className="w-5 h-5" />}
               href="/gif-studio"
               color="purple"
             />
 
             <FeatureCard
-              title="SVG Generator"
-              description="Generate lightweight, scalable SVG animations for your docs or website. CSS Keyframes support included."
-              icon={<ImageIcon className="w-5 h-5" />}
-              href="/generator"
-              color="pink"
-            />
-
-            <FeatureCard
-              title="Templates"
-              description="Ready-to-use profile headers, stat cards, and quote banners. Perfect for spicing up your GitHub Readme."
+              title="Widget Generator"
+              description="Stat cards, streak counters, and skill badges. Real-time data visualization for your profile."
               icon={<LayoutTemplate className="w-5 h-5" />}
               href="/templates"
               color="cyan"
+            />
+
+            <FeatureCard
+              title="SVG Assets"
+              description="Lightweight vector graphics and icons optimized for Markdown rendering."
+              icon={<ImageIcon className="w-5 h-5" />}
+              href="/generator"
+              color="pink"
             />
           </div>
         </section>

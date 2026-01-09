@@ -22,9 +22,9 @@ export function Navbar() {
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-white">
                     <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                        <span className="text-xs">TC</span>
+                        <span className="text-xs">RF</span>
                     </div>
-                    <span className="hidden sm:inline">Templates Chonchos</span>
+                    <span className="hidden sm:inline">Readme Forge</span>
                 </div>
 
                 <div className="flex items-center gap-1">

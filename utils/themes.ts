@@ -182,8 +182,6 @@ export const HERO_THEMES: Record<string, ThemeColors> = {
 export function getTheme(themeName: string, customColor?: string, customColor2?: string): ThemeColors {
     const baseTheme = HERO_THEMES[themeName] || HERO_THEMES['purple-cyan'];
 
-    console.log(`Getting Theme: ${themeName} | C1: ${customColor} | C2: ${customColor2}`); // Debug log
-
     if (themeName === 'custom' && customColor) {
         // If second color is provided, use it. Otherwise, create a variation or default.
         const secondary = customColor2 || '#ffffff';

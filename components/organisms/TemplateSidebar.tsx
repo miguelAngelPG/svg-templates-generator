@@ -4,8 +4,9 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
+import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
 
 interface TemplateSidebarProps {
@@ -20,13 +21,17 @@ interface TemplateSidebarProps {
 
     ultraParams: UltraParams;
     setUltraParams: (val: UltraParams) => void;
+
+    stackParams: StackParams;
+    setStackParams: (val: StackParams) => void;
 }
 
 export function TemplateSidebar({
     selectedTemplate, setSelectedTemplate,
     advancedParams, setAdvancedParams,
     heroParams, setHeroParams,
-    ultraParams, setUltraParams
+    ultraParams, setUltraParams,
+    stackParams, setStackParams
 }: TemplateSidebarProps) {
 
     // Helper to render theme options dynamically
@@ -62,6 +67,7 @@ export function TemplateSidebar({
                     <option value="advanced">Advanced Card (Marketing)</option>
                     <option value="hero">Hero Section (Profile)</option>
                     <option value="ultra">Ultra Components (Stats)</option>
+                    <option value="stack">Tech Stack (By Readme Forge)</option>
                 </Select>
             </div>
 
@@ -317,6 +323,130 @@ export function TemplateSidebar({
                                 className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-24 resize-none mt-1 placeholder-gray-600"
                             />
                         </div>
+                    </>
+                )}
+
+                {/* Stack Configuration */}
+                {selectedTemplate === 'stack' && (
+                    <>
+                        <div className="bg-[#111] p-3 rounded border border-gray-800 mb-4">
+                            <Label>Technologies</Label>
+                            <div className="mb-2">
+                                <IconPicker
+                                    selectedIcons={stackParams.technologies}
+                                    onToggleIcon={(slug) => {
+                                        const current = stackParams.technologies;
+                                        const exists = current.includes(slug);
+                                        let newTechs;
+                                        if (exists) {
+                                            newTechs = current.filter(t => t !== slug);
+                                        } else {
+                                            newTechs = [...current, slug];
+                                        }
+                                        setStackParams({ ...stackParams, technologies: newTechs });
+                                    }}
+                                />
+                            </div>
+
+                            <div className="mt-2 pt-2 border-t border-gray-800">
+                                <Label className="text-[10px] text-gray-500 mb-1">Manual Entry (Comma separated)</Label>
+                                <textarea
+                                    value={stackParams.technologies.join(', ')}
+                                    onChange={(e) => setStackParams({ ...stackParams, technologies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                                    className="bg-[#1a1a1a] rounded px-2 py-1 text-xs border border-gray-700 focus:border-purple-500 focus:outline-none text-gray-400 w-full h-12 resize-none font-mono"
+                                    placeholder="react, typescript..."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <Label>Icon Style</Label>
+                                <Select value={stackParams.iconStyle} onChange={e => setStackParams({ ...stackParams, iconStyle: e.target.value as any })} fullWidth>
+                                    <option value="original">Original Colors</option>
+                                    <option value="monochrome">Monochrome (White)</option>
+                                    <option value="glass">Glassmorphism</option>
+                                    <option value="custom">Custom Color</option>
+                                </Select>
+                            </div>
+                            <div>
+                                <ConfigField label="Gap (px)" value={String(stackParams.gap)} onChange={v => setStackParams({ ...stackParams, gap: Number(v) })} maxLength={3} />
+                            </div>
+                        </div>
+
+                        <div className="mt-2">
+                            <Label>Theme (For Background/Glass)</Label>
+                            <Select value={stackParams.theme} onChange={e => setStackParams({ ...stackParams, theme: e.target.value })} fullWidth>
+                                {renderThemeOptions()}
+                            </Select>
+                        </div>
+
+                        {/* Custom Icon Color */}
+                        {stackParams.iconStyle === 'custom' && (
+                            <div className="mt-2">
+                                <Label>Icon Color Hex</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="color"
+                                        value={stackParams.iconColor || '#ffffff'}
+                                        onChange={e => setStackParams({ ...stackParams, iconColor: e.target.value })}
+                                        className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                    />
+                                    <Input
+                                        type="text"
+                                        value={stackParams.iconColor || '#ffffff'}
+                                        onChange={e => setStackParams({ ...stackParams, iconColor: e.target.value })}
+                                        fullWidth
+                                        maxLength={7}
+                                        className="text-xs"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Custom Theme Colors */}
+                        {stackParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={stackParams.customColor || '#8855ff'}
+                                            onChange={e => setStackParams({ ...stackParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={stackParams.customColor || '#8855ff'}
+                                            onChange={e => setStackParams({ ...stackParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={stackParams.customColor2 || '#ffffff'}
+                                            onChange={e => setStackParams({ ...stackParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={stackParams.customColor2 || '#ffffff'}
+                                            onChange={e => setStackParams({ ...stackParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </>
                 )}
 

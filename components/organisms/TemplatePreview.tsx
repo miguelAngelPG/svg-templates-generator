@@ -13,9 +13,10 @@ import { UltraStat } from '../templates/ultra/UltraStat';
 import { UltraQuote } from '../templates/ultra/UltraQuote';
 import { UltraCard } from '../templates/ultra/UltraCard';
 import { UltraBadge } from '../templates/ultra/UltraBadge';
+import { TechStackRow } from '../templates/stack/TechStackRow';
 
 import { getTheme } from '@/utils/themes';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams } from '@/hooks/useTemplateGenerator';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -26,6 +27,7 @@ interface TemplatePreviewProps {
     advancedParams: AdvancedParams;
     heroParams: HeroParams;
     ultraParams: UltraParams;
+    stackParams: StackParams;
 }
 
 export function TemplatePreview({
@@ -34,7 +36,8 @@ export function TemplatePreview({
     templateName,
     advancedParams,
     heroParams,
-    ultraParams
+    ultraParams,
+    stackParams
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
@@ -88,11 +91,30 @@ export function TemplatePreview({
             else if (ultraParams.component === 'quote') component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'card') component = <UltraCard {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'badge') component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
+            if (ultraParams.component === 'stat') component = <UltraStat {...ultraParams} theme={ultraTheme} />;
+            else if (ultraParams.component === 'quote') component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
+            else if (ultraParams.component === 'card') component = <UltraCard {...ultraParams} theme={ultraTheme} />;
+            else if (ultraParams.component === 'badge') component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
+        }
+        else if (templateName === 'stack') {
+            width: 800; // flexible container
+            height: 100;
+            const theme = getTheme(stackParams.theme, stackParams.customColor, stackParams.customColor2);
+
+            component = (
+                <TechStackRow
+                    technologies={stackParams.technologies}
+                    theme={theme}
+                    iconStyle={stackParams.iconStyle}
+                    iconColor={stackParams.iconColor}
+                    gap={stackParams.gap}
+                />
+            );
         }
 
         return { component, width, height };
 
-    }, [templateName, advancedParams, heroParams, ultraParams]);
+    }, [templateName, advancedParams, heroParams, ultraParams, stackParams]);
 
     return (
         <div className="flex flex-col gap-6 h-full">

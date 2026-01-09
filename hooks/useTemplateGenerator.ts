@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack';
 
 export interface AdvancedParams {
     content: string;
@@ -35,6 +35,16 @@ export interface UltraParams {
     theme: string;
     customColor: string;
     customColor2: string;
+}
+
+export interface StackParams {
+    technologies: string[];
+    theme: string;
+    customColor: string;
+    customColor2: string;
+    iconStyle: 'original' | 'monochrome' | 'glass' | 'custom';
+    iconColor: string;
+    gap: number;
 }
 
 export function useTemplateGenerator() {
@@ -78,12 +88,22 @@ export function useTemplateGenerator() {
         customColor2: '#ffffff'
     });
 
+    const [stackParams, setStackParams] = useState<StackParams>({
+        technologies: ['react', 'typescript', 'nextdotjs', 'tailwindcss'],
+        theme: 'purple-cyan',
+        customColor: '#8855ff',
+        customColor2: '#ffffff',
+        iconStyle: 'original',
+        iconColor: '#ffffff',
+        gap: 16
+    });
+
     // Debounced Generation
     useEffect(() => {
         setIsLoading(true);
         const timer = setTimeout(() => {
             let url = '';
-            let params = new URLSearchParams();
+            const params = new URLSearchParams();
 
             if (selectedTemplate === 'advanced') {
                 const p = new URLSearchParams();
@@ -141,6 +161,23 @@ export function useTemplateGenerator() {
                 }
 
                 url = `/api/custom/ultra?${p.toString()}&t=${Date.now()}`;
+
+            } else if (selectedTemplate === 'stack') {
+                const p = new URLSearchParams();
+                p.append('technologies', stackParams.technologies.join(','));
+                p.append('theme', stackParams.theme);
+                p.append('iconStyle', stackParams.iconStyle);
+                p.append('iconColor', stackParams.iconColor.replace('#', '')); // Send without hash
+                p.append('gap', String(stackParams.gap));
+
+                if (stackParams.theme === 'custom') {
+                    p.append('customColor', stackParams.customColor || '#8855ff');
+                    const c2 = stackParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/custom/stack?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
@@ -149,7 +186,7 @@ export function useTemplateGenerator() {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams]);
 
     return {
         selectedTemplate,
@@ -159,6 +196,7 @@ export function useTemplateGenerator() {
         // State Accessors
         advancedParams, setAdvancedParams,
         heroParams, setHeroParams,
-        ultraParams, setUltraParams
+        ultraParams, setUltraParams,
+        stackParams, setStackParams
     };
 }

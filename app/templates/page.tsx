@@ -15,7 +15,8 @@ export default function TemplatesPage() {
 
         advancedParams, setAdvancedParams,
         heroParams, setHeroParams,
-        ultraParams, setUltraParams
+        ultraParams, setUltraParams,
+        stackParams, setStackParams
     } = useTemplateGenerator();
 
     return (
@@ -34,6 +35,9 @@ export default function TemplatesPage() {
 
                 ultraParams={ultraParams}
                 setUltraParams={setUltraParams}
+
+                stackParams={stackParams}
+                setStackParams={setStackParams}
             />
 
             {/* Preview Panel */}
@@ -44,6 +48,7 @@ export default function TemplatesPage() {
                 advancedParams={advancedParams}
                 heroParams={heroParams}
                 ultraParams={ultraParams}
+                stackParams={stackParams}
             />
 
         </div>

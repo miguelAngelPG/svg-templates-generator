@@ -528,7 +528,7 @@ class HtmlCssToSvgParser {
           const childWidth = this.estimateElementWidth(child, childStyles);
           const childHeight = this.estimateElementHeight(child, childStyles);
 
-          let childX = currentX;
+          const childX = currentX;
           let childY = currentY;
 
           if (isFlex && flexDirection === 'row') {

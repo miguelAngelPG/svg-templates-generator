@@ -5,7 +5,7 @@ export function renderComponentToSvg(component: ReactElement): string {
     // when importing 'react-dom/server' in Route Handlers, even if runtime is nodejs.
     // This is safe because we enforce 'nodejs' runtime in the route handler.
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const ReactDOMServer = require('react-dom/server');
     return ReactDOMServer.renderToStaticMarkup(component);
 }

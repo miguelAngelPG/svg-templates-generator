@@ -9,8 +9,9 @@ export interface AdvancedParams {
     width: number;
     height: number;
     theme: string;
-    customColor?: string;
-    customColor2?: string;
+    customColor: string;
+    customColor2: string;
+    layout: string;
 }
 
 export interface HeroParams {
@@ -20,8 +21,8 @@ export interface HeroParams {
     location: string;
     style: string;
     theme: string;
-    customColor?: string;
-    customColor2?: string;
+    customColor: string;
+    customColor2: string;
 }
 
 export interface UltraParams {
@@ -32,8 +33,8 @@ export interface UltraParams {
     value: string;
     label: string;
     theme: string;
-    customColor?: string;
-    customColor2?: string;
+    customColor: string;
+    customColor2: string;
 }
 
 export function useTemplateGenerator() {
@@ -50,7 +51,8 @@ export function useTemplateGenerator() {
         height: 400,
         theme: 'purple-cyan',
         customColor: '#8855ff',
-        customColor2: '#ffffff'
+        customColor2: '#ffffff',
+        layout: 'center'
     });
 
     const [heroParams, setHeroParams] = useState<HeroParams>({
@@ -84,14 +86,61 @@ export function useTemplateGenerator() {
             let params = new URLSearchParams();
 
             if (selectedTemplate === 'advanced') {
-                params = new URLSearchParams(advancedParams as any);
-                url = `/api/custom/advanced?${params.toString()}&t=${Date.now()}`;
+                const p = new URLSearchParams();
+                p.append('title', advancedParams.title);
+                p.append('content', advancedParams.content);
+                p.append('subtitle', advancedParams.subtitle);
+                p.append('width', String(advancedParams.width));
+                p.append('height', String(advancedParams.height));
+                p.append('height', String(advancedParams.height));
+                p.append('theme', advancedParams.theme);
+                p.append('layout', advancedParams.layout);
+
+                if (advancedParams.theme === 'custom') {
+                    p.append('customColor', advancedParams.customColor || '#8855ff');
+                    const c2 = advancedParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/custom/advanced?${p.toString()}&t=${Date.now()}`;
+
             } else if (selectedTemplate === 'hero') {
-                params = new URLSearchParams(heroParams as any);
-                url = `/api/templates/hero?${params.toString()}&t=${Date.now()}`;
+                const p = new URLSearchParams();
+                p.append('name', heroParams.name);
+                p.append('title', heroParams.title);
+                p.append('subtitle', heroParams.subtitle);
+                p.append('location', heroParams.location);
+                p.append('style', heroParams.style);
+                p.append('theme', heroParams.theme);
+
+                if (heroParams.theme === 'custom') {
+                    p.append('customColor', heroParams.customColor || '#00f2ff');
+                    const c2 = heroParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/templates/hero?${p.toString()}&t=${Date.now()}`;
+
             } else if (selectedTemplate === 'ultra') {
-                params = new URLSearchParams(ultraParams as any);
-                url = `/api/custom/ultra?${params.toString()}&t=${Date.now()}`;
+                const p = new URLSearchParams();
+                p.append('component', ultraParams.component);
+                p.append('title', ultraParams.title);
+                p.append('content', ultraParams.content);
+                p.append('icon', ultraParams.icon);
+                p.append('value', ultraParams.value);
+                p.append('label', ultraParams.label);
+                p.append('theme', ultraParams.theme);
+
+                if (ultraParams.theme === 'custom') {
+                    p.append('customColor', ultraParams.customColor || '#00f2ff');
+                    const c2 = ultraParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/custom/ultra?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);

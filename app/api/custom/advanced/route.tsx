@@ -12,13 +12,14 @@ export async function GET(request: NextRequest) {
         const title = searchParams.get('title') || '';
         const content = searchParams.get('content') || searchParams.get('description') || 'No content provided';
         const subtitle = searchParams.get('subtitle') || '';
+        const layout = searchParams.get('layout') || 'center'; // center | left | card
         const width = parseInt(searchParams.get('width') || '800');
         const height = parseInt(searchParams.get('height') || '400');
 
         // Theme Params
         const themeName = searchParams.get('theme') || 'purple-cyan';
         const customColor = searchParams.get('customColor') || undefined;
-        const customColor2 = searchParams.get('customColor2') || undefined;
+        const customColor2 = searchParams.get('customColor2') || searchParams.get('secColor') || undefined;
 
         // Shared Theme Logic
         const t = getTheme(themeName, customColor, customColor2);
@@ -33,15 +34,35 @@ export async function GET(request: NextRequest) {
             border: customColor ? `${t.accent}40` : 'rgba(255, 255, 255, 0.1)',
         };
 
-        // Layout Fijo (Card-like centrado)
-        const currentLayout = {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            padding: '40px',
+        // Layout Logic
+        const layouts: Record<string, any> = {
+            center: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: '40px',
+            },
+            left: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                textAlign: 'left',
+                paddingLeft: '60px',
+                paddingRight: '60px',
+            },
+            card: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                padding: '40px',
+            },
         };
+
+        const currentLayout = layouts[layout] || layouts.center;
 
         // JSX para Satori
         const jsx = (
@@ -63,7 +84,7 @@ export async function GET(request: NextRequest) {
                         position: 'absolute',
                         width: '100%',
                         height: '100%',
-                        background: `radial-gradient(circle at 30% 20%, ${t.blob1}20 0%, transparent 50%)`,
+                        background: `radial-gradient(circle at 30% 20%, ${t.blob1}40 0%, transparent 50%)`,
                         zIndex: 0
                     }}
                 />
@@ -74,7 +95,7 @@ export async function GET(request: NextRequest) {
                         right: 0,
                         width: '80%',
                         height: '80%',
-                        background: `radial-gradient(circle at 80% 80%, ${t.blob2}15 0%, transparent 50%)`,
+                        background: `radial-gradient(circle at 80% 80%, ${t.blob2}40 0%, transparent 50%)`,
                         zIndex: 0
                     }}
                 />
@@ -118,7 +139,7 @@ export async function GET(request: NextRequest) {
                                 fontSize: '28px',
                                 fontWeight: '500',
                                 color: currentTheme.text,
-                                textAlign: 'center',
+                                textAlign: layout === 'center' ? 'center' : 'left',
                                 maxWidth: '80%',
                                 lineHeight: '1.4',
                                 opacity: 0.9,
@@ -136,13 +157,26 @@ export async function GET(request: NextRequest) {
                                 fontSize: '20px',
                                 fontWeight: '400',
                                 color: currentTheme.secondary,
-                                textAlign: 'center',
+                                textAlign: layout === 'center' ? 'center' : 'left',
                                 maxWidth: '80%',
                                 opacity: 0.8,
                             }}
                         >
                             {subtitle}
                         </div>
+                    )}
+
+                    {/* Accent Line (Card Layout) */}
+                    {layout === 'card' && (
+                        <div
+                            style={{
+                                width: '100px',
+                                height: '4px',
+                                background: currentTheme.accent,
+                                marginTop: '30px',
+                                borderRadius: '2px',
+                            }}
+                        />
                     )}
                 </div>
             </div>

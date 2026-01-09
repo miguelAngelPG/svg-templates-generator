@@ -182,6 +182,8 @@ export const HERO_THEMES: Record<string, ThemeColors> = {
 export function getTheme(themeName: string, customColor?: string, customColor2?: string): ThemeColors {
     const baseTheme = HERO_THEMES[themeName] || HERO_THEMES['purple-cyan'];
 
+    console.log(`Getting Theme: ${themeName} | C1: ${customColor} | C2: ${customColor2}`); // Debug log
+
     if (themeName === 'custom' && customColor) {
         // If second color is provided, use it. Otherwise, create a variation or default.
         const secondary = customColor2 || '#ffffff';
@@ -190,9 +192,9 @@ export function getTheme(themeName: string, customColor?: string, customColor2?:
             bg: '#0a0a0a',
             bgGradient: 'linear-gradient(135deg, #0a0a0a 0%, #000 100%)',
             accent: customColor,
-            gradient: `linear-gradient(to right, ${customColor}, ${secondary})`,
+            gradient: `linear-gradient(135deg, ${customColor} 0%, ${secondary} 100%)`, // Diagonal gradient is more visible
             blob1: customColor,
-            blob2: secondary === '#ffffff' ? `${customColor}` : secondary
+            blob2: secondary // Always use secondary if provided
         };
     }
 

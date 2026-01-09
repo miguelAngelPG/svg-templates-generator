@@ -115,7 +115,10 @@ export function TemplateSidebar({
                                         <Input
                                             type="color"
                                             value={advancedParams.customColor2 || '#ffffff'}
-                                            onChange={e => setAdvancedParams({ ...advancedParams, customColor2: e.target.value })}
+                                            onChange={e => {
+                                                setAdvancedParams({ ...advancedParams, customColor2: e.target.value })
+                                                console.log(e.target.value)
+                                            }}
                                             className="w-8 h-8 p-1 cursor-pointer shrink-0"
                                         />
                                         <Input

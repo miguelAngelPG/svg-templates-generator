@@ -54,13 +54,13 @@ export function TemplatePreview({
         if (templateName === 'advanced') {
             width = advancedParams.width;
             height = advancedParams.height;
-            const theme = getTheme(advancedParams.theme, advancedParams.customColor);
+            const theme = getTheme(advancedParams.theme, advancedParams.customColor, advancedParams.customColor2);
             component = <AdvancedCard {...advancedParams} theme={theme} />;
         }
         else if (templateName === 'hero') {
             width = 800;
             height = 400; // Hero default
-            const theme = getTheme(heroParams.theme, heroParams.customColor);
+            const theme = getTheme(heroParams.theme, heroParams.customColor, heroParams.customColor2);
 
             if (heroParams.style === 'modern') component = <ModernTemplate {...heroParams} theme={theme} />;
             else if (heroParams.style === 'minimal') component = <MinimalTemplate {...heroParams} theme={theme} />;
@@ -69,7 +69,7 @@ export function TemplatePreview({
         else if (templateName === 'ultra') {
             width = 600;
             height = 300;
-            const theme = getTheme(ultraParams.theme, ultraParams.customColor);
+            const theme = getTheme(ultraParams.theme, ultraParams.customColor, ultraParams.customColor2);
 
             // Map shared theme to Ultra format
             const ultraTheme = {

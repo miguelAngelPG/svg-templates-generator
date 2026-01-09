@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const style = searchParams.get('style') || 'modern'; // modern | minimal | cyber
     const themeName = searchParams.get('theme') || 'purple-cyan';
     const customColor = searchParams.get('customColor') || undefined;
-    const customColor2 = searchParams.get('customColor2') || undefined;
+    const customColor2 = searchParams.get('customColor2') || searchParams.get('secColor') || undefined;
 
     // 1. Get Theme configuration
     const theme = getTheme(themeName, customColor, customColor2);

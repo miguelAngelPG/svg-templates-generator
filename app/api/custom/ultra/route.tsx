@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const label = searchParams.get('label') || '';
     const componentType = searchParams.get('component') || 'stat';
     const customColor = searchParams.get('customColor') || undefined;
-    const customColor2 = searchParams.get('customColor2') || undefined;
+    const customColor2 = searchParams.get('customColor2') || searchParams.get('secColor') || undefined;
 
     const useNewRender = true; // Flag to easily switch if needed
 

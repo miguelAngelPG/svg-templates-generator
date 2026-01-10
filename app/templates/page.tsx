@@ -18,7 +18,8 @@ export default function TemplatesPage() {
         ultraParams, setUltraParams,
         stackParams, setStackParams,
         socialParams, setSocialParams,
-        philosophyParams, setPhilosophyParams
+        philosophyParams, setPhilosophyParams,
+        impactParams, setImpactParams
     } = useTemplateGenerator();
 
     return (
@@ -46,6 +47,9 @@ export default function TemplatesPage() {
 
                 philosophyParams={philosophyParams}
                 setPhilosophyParams={setPhilosophyParams}
+
+                impactParams={impactParams}
+                setImpactParams={setImpactParams}
             />
 
             {/* Preview Panel */}
@@ -59,6 +63,7 @@ export default function TemplatesPage() {
                 stackParams={stackParams}
                 socialParams={socialParams}
                 philosophyParams={philosophyParams}
+                impactParams={impactParams}
             />
 
         </div>

@@ -15,9 +15,10 @@ import { UltraCard } from '../templates/ultra/UltraCard';
 import { UltraBadge } from '../templates/ultra/UltraBadge';
 import { TechStackRow } from '../templates/stack/TechStackRow';
 import { PhilosophyTemplate } from '../templates/philosophy/PhilosophyTemplate';
+import { ImpactTemplate } from '../templates/impact/ImpactTemplate';
 
 import { getTheme } from '@/utils/themes';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams, ImpactParams } from '@/hooks/useTemplateGenerator';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -31,6 +32,7 @@ interface TemplatePreviewProps {
     stackParams: StackParams;
     socialParams: SocialParams;
     philosophyParams: PhilosophyParams;
+    impactParams: ImpactParams;
 }
 
 export function TemplatePreview({
@@ -42,7 +44,8 @@ export function TemplatePreview({
     ultraParams,
     stackParams,
     socialParams,
-    philosophyParams
+    philosophyParams,
+    impactParams
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
@@ -156,10 +159,37 @@ export function TemplatePreview({
                 />
             );
         }
+        else if (templateName === 'impact') {
+            width = 380;
+            height = 420;
+            const theme = getTheme(impactParams.theme, impactParams.customColor, impactParams.customColor2);
+
+            // Map theme to Impact format (Needs primary, secondary, accent)
+            // We can map from our standard theme keys
+            const impactTheme = {
+                primary: theme.accent, // The main glowing color
+                secondary: theme.blob1 || theme.accent, // Secondary gradient color
+                accent: theme.blob2 || '#ffffff' // Text accent
+            };
+
+            component = (
+                <ImpactTemplate
+                    company={impactParams.company}
+                    role={impactParams.role}
+                    year={impactParams.year}
+                    stat={impactParams.stat}
+                    statDesc={impactParams.statDesc}
+                    description={impactParams.description}
+                    techArray={impactParams.tech.split(',').map(t => t.trim()).slice(0, 4)}
+                    logo={impactParams.logo}
+                    theme={impactTheme}
+                />
+            );
+        }
 
         return { component, width, height };
 
-    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams, generatedUrl, isLoading]);
+    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams, impactParams, generatedUrl, isLoading]);
 
     return (
         <div className="flex flex-col gap-6 h-full">

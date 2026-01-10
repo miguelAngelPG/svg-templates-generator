@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'philosophy';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'philosophy' | 'impact';
 
 export interface AdvancedParams {
     content: string;
@@ -61,6 +61,20 @@ export interface PhilosophyParams {
     quote: string;
     icon: string;
     lang: 'en' | 'es';
+    theme: string;
+    customColor: string;
+    customColor2: string;
+}
+
+export interface ImpactParams {
+    company: string;
+    role: string;
+    year: string;
+    stat: string;
+    statDesc: string;
+    description: string;
+    tech: string;
+    logo: string;
     theme: string;
     customColor: string;
     customColor2: string;
@@ -137,6 +151,20 @@ export function useTemplateGenerator() {
         lang: 'en',
         theme: 'orange-pink',
         customColor: '#ffaa40',
+        customColor2: '#ffffff'
+    });
+
+    const [impactParams, setImpactParams] = useState<ImpactParams>({
+        company: 'Tech Corp',
+        role: 'Senior Engineer',
+        year: '2024 - Present',
+        stat: '+40%',
+        statDesc: 'Performance Boost',
+        description: 'Led the migration to micro-frontends reducing build times by 60%.',
+        tech: 'React,Next.js,TypeScript,AWS',
+        logo: '🚀',
+        theme: 'cyan',
+        customColor: '#00f2ff',
         customColor2: '#ffffff'
     });
 
@@ -253,6 +281,26 @@ export function useTemplateGenerator() {
                 }
 
                 url = `/api/templates/philosophy?${p.toString()}&t=${Date.now()}`;
+            } else if (selectedTemplate === 'impact') {
+                const p = new URLSearchParams();
+                p.append('company', impactParams.company);
+                p.append('role', impactParams.role);
+                p.append('year', impactParams.year);
+                p.append('stat', impactParams.stat);
+                p.append('desc', impactParams.statDesc);
+                p.append('description', impactParams.description);
+                p.append('tech', impactParams.tech);
+                p.append('logo', impactParams.logo);
+                p.append('theme', impactParams.theme);
+
+                if (impactParams.theme === 'custom') {
+                    p.append('customColor', impactParams.customColor || '#00f2ff');
+                    const c2 = impactParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/templates/impact?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
@@ -261,7 +309,7 @@ export function useTemplateGenerator() {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams, impactParams]);
 
     return {
         selectedTemplate,
@@ -274,6 +322,7 @@ export function useTemplateGenerator() {
         ultraParams, setUltraParams,
         stackParams, setStackParams,
         socialParams, setSocialParams,
-        philosophyParams, setPhilosophyParams
+        philosophyParams, setPhilosophyParams,
+        impactParams, setImpactParams
     };
 }

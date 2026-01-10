@@ -4,7 +4,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams, ImpactParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
 import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
@@ -30,6 +30,9 @@ interface TemplateSidebarProps {
 
     philosophyParams: PhilosophyParams;
     setPhilosophyParams: (val: PhilosophyParams) => void;
+
+    impactParams: ImpactParams;
+    setImpactParams: (val: ImpactParams) => void;
 }
 
 export function TemplateSidebar({
@@ -39,7 +42,8 @@ export function TemplateSidebar({
     ultraParams, setUltraParams,
     stackParams, setStackParams,
     socialParams, setSocialParams,
-    philosophyParams, setPhilosophyParams
+    philosophyParams, setPhilosophyParams,
+    impactParams, setImpactParams
 }: TemplateSidebarProps) {
 
     // Helper to render theme options dynamically
@@ -78,6 +82,7 @@ export function TemplateSidebar({
                     <option value="stack">Tech Stack (By Readme Forge)</option>
                     <option value="social">Social Hub (Connect)</option>
                     <option value="philosophy">Philosophy (Personal)</option>
+                    <option value="impact">Impact Card (Resume)</option>
                 </Select>
             </div>
 
@@ -696,6 +701,91 @@ export function TemplateSidebar({
                                             type="text"
                                             value={philosophyParams.customColor2 || '#ffffff'}
                                             onChange={e => setPhilosophyParams({ ...philosophyParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Impact Configuration */}
+                {selectedTemplate === 'impact' && (
+                    <>
+                        <div className="grid grid-cols-2 gap-2">
+                            <ConfigField label="Company" value={impactParams.company} onChange={v => setImpactParams({ ...impactParams, company: v })} maxLength={20} />
+                            <ConfigField label="Role" value={impactParams.role} onChange={v => setImpactParams({ ...impactParams, role: v })} maxLength={25} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <ConfigField label="Year/Badge" value={impactParams.year} onChange={v => setImpactParams({ ...impactParams, year: v })} maxLength={15} />
+                            <ConfigField label="Logo/Emoji" value={impactParams.logo} onChange={v => setImpactParams({ ...impactParams, logo: v })} maxLength={2} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <ConfigField label="Big Stat" value={impactParams.stat} onChange={v => setImpactParams({ ...impactParams, stat: v })} maxLength={8} />
+                            <ConfigField label="Stat Label" value={impactParams.statDesc} onChange={v => setImpactParams({ ...impactParams, statDesc: v })} maxLength={20} />
+                        </div>
+
+                        <div className="mt-2">
+                            <Label>Description</Label>
+                            <textarea
+                                value={impactParams.description}
+                                onChange={(e) => setImpactParams({ ...impactParams, description: e.target.value })}
+                                maxLength={120}
+                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-16 resize-none mt-1"
+                            />
+                        </div>
+
+                        <div className="mt-2">
+                            <ConfigField label="Tech Stack (comma sep)" value={impactParams.tech} onChange={v => setImpactParams({ ...impactParams, tech: v })} maxLength={50} />
+                        </div>
+
+
+                        <div className="mt-2">
+                            <Label>Theme</Label>
+                            <Select value={impactParams.theme} onChange={e => setImpactParams({ ...impactParams, theme: e.target.value })} fullWidth>
+                                {renderThemeOptions()}
+                            </Select>
+                        </div>
+
+                        {impactParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={impactParams.customColor || '#00f2ff'}
+                                            onChange={e => setImpactParams({ ...impactParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={impactParams.customColor || '#00f2ff'}
+                                            onChange={e => setImpactParams({ ...impactParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={impactParams.customColor2 || '#ffffff'}
+                                            onChange={e => setImpactParams({ ...impactParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={impactParams.customColor2 || '#ffffff'}
+                                            onChange={e => setImpactParams({ ...impactParams, customColor2: e.target.value })}
                                             fullWidth
                                             maxLength={7}
                                             className="text-xs"

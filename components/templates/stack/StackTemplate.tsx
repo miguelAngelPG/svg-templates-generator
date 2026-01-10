@@ -1,143 +1,93 @@
 import React from 'react';
+import { ThemeColors } from '@/utils/themes';
 
 interface StackTemplateProps {
-    itemsArray: string[];
-    detailsArray: string[];
-    iconsArray: string[];
-    theme: {
-        primary: string;
-        secondary: string;
-        accent: string;
-    };
+    icons: { slug: string; svg: string }[];
+    theme: ThemeColors;
+    iconStyle: 'original' | 'monochrome' | 'glass' | 'custom';
+    gap: number;
+    bgTransparent?: boolean;
 }
 
-export const StackTemplate = ({
-    itemsArray,
-    detailsArray,
-    iconsArray,
-    theme
-}: StackTemplateProps) => {
+export const StackTemplate: React.FC<StackTemplateProps> = ({
+    icons,
+    theme,
+    iconStyle,
+    gap,
+    bgTransparent
+}) => {
+    // Shared Layout Dimensions
+    const iconSize = 40;
+    const padding = 20;
+
+    // We calculate width based on content if needed, but for flex container 
+    // we often let the parent decide or use 100%. 
+    // Here we ensure the inner content fits the requested gap.
+
     return (
-        <div style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: '#050505',
-            padding: '20px',
-            fontFamily: 'Outfit',
-            position: 'relative',
-        }}>
-            {/* Glass Panel Background */}
-            <div style={{
-                position: 'absolute',
-                top: 20, left: 20, right: 20, bottom: 20,
-                borderRadius: '20px',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                // Shadow would be simulated here or via filter injection
-            }} />
-
-            {/* Header */}
-            <div style={{
+        <div
+            style={{
                 display: 'flex',
-                padding: '0 25px',
-                marginBottom: '15px',
-                zIndex: 10,
-                alignItems: 'center'
-            }}>
-                <div style={{
-                    fontSize: '18px',
-                    fontWeight: 600,
-                    letterSpacing: '1px',
-                    // Gradient text fallback
-                    color: theme.primary
-                }}>
-                    🛠️ Tech Arsenal
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '100%', // Adjust to parent
+                background: 'transparent',
+                gap: `${gap}px`,
+                padding: `${padding}px`,
+                position: 'relative' // For absolute bg
+            }}
+        >
+            {/* Background */}
+            {!bgTransparent && (iconStyle === 'glass' || theme.bgGradient) && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 'calc(100% - 20px)', // Slightly smaller than container for visual flair
+                        height: '80px',
+                        background: iconStyle === 'glass'
+                            ? (theme.accent ? `${theme.accent}15` : 'rgba(255, 255, 255, 0.05)')
+                            : (theme.bgGradient || theme.bg),
+                        borderRadius: '50px',
+                        border: iconStyle === 'glass' ? `1px solid ${theme.border || 'rgba(255,255,255,0.1)'}` : 'none',
+                        boxShadow: iconStyle === 'glass' ? `0 4px 30px ${theme.accent}20` : 'none',
+                        backdropFilter: iconStyle === 'glass' ? 'blur(10px)' : 'none', // Works in Browser, ignored in Satori (Satori needs pure SVG or filter injection)
+                        zIndex: 0
+                    }}
+                />
+            )}
+
+            {icons.map((icon, index) => (
+                <div
+                    key={`${icon.slug}-${index}`}
+                    style={{
+                        display: 'flex',
+                        width: `${iconSize}px`,
+                        height: `${iconSize}px`,
+                        zIndex: 1,
+                        // Drop shadow filter works in some SVG renderers, Satori supports filter prop on elements
+                        filter: iconStyle === 'glass' ? 'drop-shadow(0 0 5px rgba(255,255,255,0.3))' : 'none'
+                    }}
+                >
+                    {/* 
+                      Satori requires base64 images for reliable external SVGs if they are not simple paths.
+                      However, since we have the SVG string, we can try rendering it as a data URI image
+                      which provides maximum compatibility for both Browser and Satori.
+                    */}
+                    <img
+                        src={`data:image/svg+xml;base64,${typeof window !== 'undefined' ? btoa(icon.svg) : Buffer.from(icon.svg).toString('base64')}`}
+                        width={iconSize}
+                        height={iconSize}
+                        style={{
+                            objectFit: 'contain'
+                        }}
+                        alt={icon.slug}
+                    />
                 </div>
-            </div>
-
-            {/* Grid Items Container */}
-            <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '15px', // Gap between items
-                padding: '0 25px',
-                zIndex: 10
-            }}>
-                {itemsArray.map((item, index) => {
-                    const icon = iconsArray[index] || '⚡';
-                    const detail = detailsArray[index] || 'Tech Stack';
-
-                    return (
-                        <div key={index} style={{
-                            display: 'flex',
-                            width: '165px',
-                            height: '90px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                            border: `1px solid ${theme.primary}26`, // 0.15 opacity hex approx
-                            borderRadius: '12px',
-                            padding: '12px',
-                            position: 'relative',
-                            // The animations (fade in) will be handled by styles injection targeting classes if possible, 
-                            // or just implicitly via the static render likely.
-                        }}>
-                            {/* Icon Section */}
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '40px',
-                                height: '40px',
-                                marginRight: '10px'
-                            }}>
-                                <div style={{ fontSize: '28px' }}>{icon}</div>
-                            </div>
-
-                            {/* Text Section */}
-                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                <div style={{
-                                    fontSize: '14px',
-                                    color: '#ffffff',
-                                    fontWeight: 700,
-                                    marginBottom: '4px'
-                                }}>
-                                    {item.trim()}
-                                </div>
-                                <div style={{
-                                    fontSize: '10px',
-                                    color: '#666666',
-                                    fontWeight: 400
-                                }}>
-                                    {detail.trim().split('|').join(', ')}
-                                </div>
-                            </div>
-
-                            {/* Accent Dot */}
-                            <div style={{
-                                position: 'absolute',
-                                top: '10px',
-                                right: '10px',
-                                width: '4px',
-                                height: '4px',
-                                borderRadius: '50%',
-                                backgroundColor: theme.accent,
-                                opacity: 0.6
-                            }} />
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Decorative Line */}
-            <div style={{
-                position: 'absolute',
-                top: '55px',
-                left: '45px',
-                right: '45px',
-                height: '1px',
-                backgroundColor: 'rgba(255,255,255,0.05)'
-            }} />
+            ))}
         </div>
     );
 };

@@ -15,7 +15,7 @@ import { UltraQuote } from '../templates/ultra/UltraQuote';
 import { ActionButtons } from '../molecules/ActionButtons';
 import { UltraCard } from '../templates/ultra/UltraCard';
 import { UltraBadge } from '../templates/ultra/UltraBadge';
-import { TechStackRow } from '../templates/stack/TechStackRow';
+import { StackTemplate } from '../templates/stack/StackTemplate';
 import { PhilosophyTemplate } from '../templates/philosophy/PhilosophyTemplate';
 import { ImpactTemplate } from '../templates/impact/ImpactTemplate';
 
@@ -51,6 +51,34 @@ export function TemplatePreview({
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
+
+    // --- Stack Icons Fetching (Client Side) ---
+    const [stackIcons, setStackIcons] = useState<{ slug: string; svg: string }[]>([]);
+    const [isFetchingStack, setIsFetchingStack] = useState(false);
+
+    useEffect(() => {
+        if (templateName === 'stack') {
+            setIsFetchingStack(true);
+
+            // Determine if we should request specific colors (for monochrome/custom)
+            // If style is 'original', we pass undefined so the fetcher uses the default brand color.
+            const colorToFetch = (stackParams.iconStyle === 'monochrome' || stackParams.iconStyle === 'custom')
+                ? stackParams.iconColor
+                : undefined;
+
+            import('@/utils/social-icons').then(({ fetchIcons }) => {
+                fetchIcons(stackParams.technologies, colorToFetch).then(icons => {
+                    setStackIcons(icons);
+                    setIsFetchingStack(false);
+                });
+            });
+        }
+    }, [templateName, stackParams.technologies, stackParams.iconColor, stackParams.iconStyle]); // Added iconStyle dependency
+
+    // ... (rest of the file)
+
+
+
 
     // --- Social Icons Fetching (Client Side) ---
     const [socialPlatforms, setSocialPlatforms] = useState<SocialPlatform[]>([]);
@@ -187,15 +215,24 @@ export function TemplatePreview({
             const theme = getTheme(stackParams.theme, stackParams.customColor, stackParams.customColor2);
 
             component = (
-                <TechStackRow
-                    technologies={stackParams.technologies}
-                    theme={theme}
-                    themeName={stackParams.theme}
-                    iconStyle={stackParams.iconStyle}
-                    iconColor={stackParams.iconColor}
-                    gap={stackParams.gap}
-                    bgTransparent={stackParams.bgTransparent}
-                />
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {/* UX Improvement: Subtle opacity transition instead of unmounting */}
+                    <div style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        opacity: isFetchingStack ? 0.6 : 1,
+                        transition: 'opacity 0.2s ease-in-out'
+                    }}>
+                        <StackTemplate
+                            icons={stackIcons}
+                            theme={theme}
+                            iconStyle={stackParams.iconStyle}
+                            gap={stackParams.gap}
+                            bgTransparent={stackParams.bgTransparent}
+                        />
+                    </div>
+                </div>
             );
         }
         else if (templateName === 'social') {

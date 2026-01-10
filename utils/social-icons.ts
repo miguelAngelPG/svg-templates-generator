@@ -30,70 +30,66 @@ export interface SocialPlatform {
 }
 
 /**
- * Fetches the SVG icon for a given provider slug using multiple strategies.
+ * Fetches the SVG icon for a given provider or tech slug using simple-icons.
  * Works in both Node.js (Server) and Browser (Client) environments.
  */
-export async function fetchSocialIcon(provider: string): Promise<string | null> {
-    const slug = provider.toLowerCase().trim();
-    const cleanSlug = SLUG_MAP[slug] || slug;
+export async function fetchIcon(slug: string, color?: string): Promise<string | null> {
+    const cleanSlug = (SLUG_MAP[slug.toLowerCase().trim()] || slug.toLowerCase().trim());
 
-    // Helper to ensure white fill for dark backgrounds
-    const generalizeSvg = (svgText: string) => {
-        if (!svgText.includes('fill=')) {
-            return svgText.replace('<svg', '<svg fill="white"');
-        } else {
-            return svgText.replace(/fill="[^"]*"/g, 'fill="white"');
-        }
-    };
-
-    // Strategy 1: jsdelivr (npm mirror)
-    try {
-        const res = await fetch(`https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/${cleanSlug}.svg`);
-        if (res.ok) {
-            return generalizeSvg(await res.text());
-        }
-    } catch (e) {
-        // Continue to next strategy
+    // Construct URL based on source
+    // Primary: simpleicons.org
+    let url = `https://cdn.simpleicons.org/${cleanSlug}`;
+    if (color) {
+        url += `/${color.replace('#', '')}`;
     }
 
-    // Strategy 2: simpleicons.org CDN
     try {
-        const res = await fetch(`https://cdn.simpleicons.org/${cleanSlug}`);
+        const res = await fetch(url);
         if (res.ok) {
-            return generalizeSvg(await res.text());
+            let svg = await res.text();
+            // Ensure compatibility (replace fill if needed/generic)
+            if (!color && !svg.includes('fill=')) {
+                svg = svg.replace('<svg', '<svg fill="white"');
+            }
+            return svg;
         }
     } catch (e) {
-        // Continue
+        console.warn(`Failed to fetch icon: ${cleanSlug}`, e);
     }
-
-    // Strategy 3: unpkg
-    try {
-        const res = await fetch(`https://unpkg.com/simple-icons@latest/icons/${cleanSlug}.svg`);
-        if (res.ok) {
-            return generalizeSvg(await res.text());
-        }
-    } catch (e) {
-        // Continue
-    }
-
     return null;
 }
 
 /**
- * Batch fetches icons for multiple platforms.
+ * Legacy wrapper for compatibility
  */
+export const fetchSocialIcon = (provider: string) => fetchIcon(provider);
+
+/**
+ * Batch fetches icons.
+ */
+export async function fetchIcons(slugs: string[], color?: string): Promise<{ slug: string; svg: string }[]> {
+    const promises = slugs.map(async (slug) => {
+        const svg = await fetchIcon(slug, color);
+        if (svg) return { slug, svg };
+        return null;
+    });
+    return (await Promise.all(promises)).filter(Boolean) as { slug: string; svg: string }[];
+}
+
+
 export async function fetchSocialIcons(platforms: { provider: string; username: string }[]): Promise<SocialPlatform[]> {
     const promises = platforms.map(async (p) => {
         if (!p.provider) return null;
         try {
-            const svg = await fetchSocialIcon(p.provider);
+            const svg = await fetchIcon(p.provider);
             if (svg) {
                 return { ...p, svg };
             }
+            // Fallback: continue without SVG if fetch fails, but best to have it
         } catch (e) {
             console.error(`Failed to fetch icon for ${p.provider}`, e);
         }
-        return null; // Don't return platforms without icons to avoid broken images
+        return null;
     });
 
     return (await Promise.all(promises)).filter(Boolean) as SocialPlatform[];

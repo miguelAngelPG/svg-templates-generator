@@ -20,9 +20,10 @@ import { PhilosophyTemplate } from '../templates/philosophy/PhilosophyTemplate';
 import { ImpactTemplate } from '../templates/impact/ImpactTemplate';
 
 import { getTheme } from '@/utils/themes';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
 import { fetchSocialIcons, SocialPlatform } from '@/utils/social-icons';
 import { SocialTemplate } from '../templates/social/SocialTemplate';
+import { RetroTemplate } from '../templates/retro/RetroTemplate';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams } from '@/hooks/useTemplateGenerator';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -35,8 +36,9 @@ interface TemplatePreviewProps {
     ultraParams: UltraParams;
     stackParams: StackParams;
     socialParams: SocialParams;
-
-
+    retroParams: RetroParams;
+    activeField: string | null;
+    setActiveField: (field: string | null) => void;
 }
 
 export function TemplatePreview({
@@ -48,6 +50,9 @@ export function TemplatePreview({
     ultraParams,
     stackParams,
     socialParams,
+    retroParams,
+    activeField,
+    setActiveField
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
@@ -199,7 +204,7 @@ export function TemplatePreview({
                     // Standard Ultra Card is determined by UltraCard.tsx (600x300)
                     width = 600;
                     height = 300;
-                    component = <UltraCard {...ultraParams} theme={ultraTheme} />;
+                    component = <UltraCard {...ultraParams} theme={ultraTheme} onFieldClick={setActiveField} />;
                 }
             }
             else if (ultraParams.component === 'badge') {
@@ -274,6 +279,25 @@ export function TemplatePreview({
                             />
                         </div>
                     )}
+                </div>
+            );
+        }
+        else if (templateName === 'retro') {
+            const theme = getTheme(retroParams.theme, retroParams.customColor, retroParams.customColor2);
+
+            // Adjust dimensions based on style
+            if (retroParams.style === 'gameboy') {
+                width = 300;
+                height = 500;
+            } else {
+                // RPG Dialog
+                width = 600;
+                height = 200;
+            }
+
+            component = (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <RetroTemplate {...retroParams} theme={theme} onFieldClick={setActiveField} />
                 </div>
             );
         }

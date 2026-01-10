@@ -17,7 +17,9 @@ export default function TemplatesPage() {
         heroParams, setHeroParams,
         ultraParams, setUltraParams,
         stackParams, setStackParams,
-        socialParams, setSocialParams
+        socialParams, setSocialParams,
+        retroParams, setRetroParams,
+        activeField, setActiveField
     } = useTemplateGenerator();
 
     return (
@@ -42,6 +44,11 @@ export default function TemplatesPage() {
 
                 socialParams={socialParams}
                 setSocialParams={setSocialParams}
+                retroParams={retroParams}
+                setRetroParams={setRetroParams}
+
+                activeField={activeField}
+                setActiveField={setActiveField}
             />
 
             {/* Preview Panel */}
@@ -54,6 +61,9 @@ export default function TemplatesPage() {
                 ultraParams={ultraParams}
                 stackParams={stackParams}
                 socialParams={socialParams}
+                retroParams={retroParams}
+                activeField={activeField}
+                setActiveField={setActiveField}
             />
 
         </div>

@@ -4,8 +4,9 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
+import { TemplateSelector } from '../molecules/TemplateSelector';
 import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
 
@@ -28,9 +29,11 @@ interface TemplateSidebarProps {
     socialParams: SocialParams;
     setSocialParams: (val: SocialParams) => void;
 
+    retroParams: RetroParams;
+    setRetroParams: (val: RetroParams) => void;
 
-
-
+    activeField: string | null;
+    setActiveField: (field: string | null) => void;
 }
 
 export function TemplateSidebar({
@@ -39,8 +42,40 @@ export function TemplateSidebar({
     heroParams, setHeroParams,
     ultraParams, setUltraParams,
     stackParams, setStackParams,
-    socialParams, setSocialParams
+    socialParams, setSocialParams,
+    retroParams, setRetroParams,
+    activeField, setActiveField
 }: TemplateSidebarProps) {
+
+    // Auto-scroll and focus effect
+    React.useEffect(() => {
+        if (activeField) {
+            // Find input with matching name or data-field attribute
+            // We'll use data-field for specific mapping
+            const element = document.querySelector(`[data-field="${activeField}"]`) as HTMLElement;
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // If it's an input/textarea/select, focus it
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)) {
+                    element.focus();
+                } else {
+                    const input = element.querySelector('input') || element.querySelector('textarea') || element.querySelector('select');
+                    if (input) {
+                        input.focus();
+                        input.style.transition = 'box-shadow 0.3s';
+                        input.style.boxShadow = '0 0 0 2px #22d3ee'; // Cyan ring
+                        setTimeout(() => input.style.boxShadow = '', 2000);
+                    }
+                }
+
+                // Highlight wrapper effect
+                element.classList.add('bg-gray-800/50');
+                setTimeout(() => {
+                    element.classList.remove('bg-gray-800/50');
+                }, 1000);
+            }
+        }
+    }, [activeField]);
 
     // Helper to render theme options dynamically
     const renderThemeOptions = () => (
@@ -63,25 +98,117 @@ export function TemplateSidebar({
                 </h1>
             </div>
 
-            {/* Template Selector */}
-            <div className="bg-[#111] p-4 rounded-lg border border-gray-800">
-                <Label>SELECT TEMPLATE</Label>
-                <Select
-                    value={selectedTemplate}
-                    onChange={(e) => setSelectedTemplate(e.target.value as TemplateType)}
-                    fullWidth
-                    className="mt-1"
-                >
-                    <option value="advanced">Advanced Card (Marketing)</option>
-                    <option value="hero">Hero Section (Profile)</option>
-                    <option value="ultra">Ultra Components (Stats)</option>
-                    <option value="stack">Tech Stack (By Readme Forge)</option>
-                    <option value="social">Social Hub (Connect)</option>
-                </Select>
-            </div>
+            {/* Template Selector Visual */}
+            <Label className="mb-2 block text-xs font-bold text-gray-500 uppercase tracking-widest">Elige tu Template</Label>
+            <TemplateSelector
+                selectedTemplate={selectedTemplate}
+                onSelect={setSelectedTemplate}
+            />
 
             {/* Dynamic Forms */}
-            <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3">
+            <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 pb-8">
+
+                {selectedTemplate === 'retro' && (
+                    <>
+                        <div className="bg-[#111] p-3 rounded border border-gray-800 mb-2">
+                            <Label>Console Style</Label>
+                            <div data-field="style">
+                                <Select
+                                    value={retroParams.style}
+                                    onChange={(e) => setRetroParams({ ...retroParams, style: e.target.value as any })}
+                                    fullWidth
+                                    className="mt-1"
+                                >
+                                    <option value="gameboy">Game Boy Classic</option>
+                                    <option value="rpg">RPG Dialog Box</option>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div data-field="txt_1">
+                            <ConfigField
+                                label={retroParams.style === 'gameboy' ? "Player Name" : "Character Name"}
+                                value={retroParams.txt_1}
+                                onChange={v => setRetroParams({ ...retroParams, txt_1: v })}
+                            />
+                        </div>
+                        <div data-field="txt_2">
+                            <ConfigField
+                                label={retroParams.style === 'gameboy' ? "Level / Status" : "Dialog Text"}
+                                value={retroParams.txt_2}
+                                onChange={v => setRetroParams({ ...retroParams, txt_2: v })}
+                            />
+                        </div>
+
+                        <div className="mt-2" data-field="img_1">
+                            <Label>Avatar / Sprite URL</Label>
+                            <div className="flex gap-2 items-center">
+                                <Input
+                                    value={retroParams.img_1}
+                                    onChange={(e) => setRetroParams({ ...retroParams, img_1: e.target.value })}
+                                    placeholder="https://..."
+                                    fullWidth
+                                    className="text-xs font-mono"
+                                />
+                                {retroParams.img_1 && (
+                                    <div className="w-8 h-8 rounded border border-gray-700 overflow-hidden shrink-0">
+                                        <img src={retroParams.img_1} className="w-full h-full object-cover" alt="Preview" />
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-[10px] text-gray-500 mt-1">Pixel art works best!</p>
+                        </div>
+
+                        <div className="mt-4 border-t border-gray-800 pt-4" data-field="theme">
+                            <Label>Theme</Label>
+                            <Select
+                                value={retroParams.theme}
+                                onChange={(e) => setRetroParams({ ...retroParams, theme: e.target.value })}
+                                fullWidth
+                                className="mt-1"
+                            >
+                                {renderThemeOptions()}
+                            </Select>
+                        </div>
+
+                        {retroParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Color</Label>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="color"
+                                            value={retroParams.customColor}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor: e.target.value })}
+                                            className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
+                                        />
+                                        <Input
+                                            value={retroParams.customColor}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor: e.target.value })}
+                                            className="font-mono text-xs w-20"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Color</Label>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="color"
+                                            value={retroParams.customColor2}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor2: e.target.value })}
+                                            className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
+                                        />
+                                        <Input
+                                            value={retroParams.customColor2}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor2: e.target.value })}
+                                            className="font-mono text-xs w-20"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
 
                 {selectedTemplate === 'advanced' && (
                     <>
@@ -153,16 +280,24 @@ export function TemplateSidebar({
 
                 {selectedTemplate === 'hero' && (
                     <>
-                        <ConfigField label="Name" value={heroParams.name} onChange={v => setHeroParams({ ...heroParams, name: v })} maxLength={20} />
-                        <ConfigField label="Title" value={heroParams.title} onChange={v => setHeroParams({ ...heroParams, title: v })} maxLength={30} />
-                        <ConfigField label="Subtitle" value={heroParams.subtitle} onChange={v => setHeroParams({ ...heroParams, subtitle: v })} maxLength={40} />
-                        <ConfigField label="Location" value={heroParams.location} onChange={v => setHeroParams({ ...heroParams, location: v })} maxLength={20} />
+                        <div data-field="heroParams.name">
+                            <ConfigField label="Name" value={heroParams.name} onChange={v => setHeroParams({ ...heroParams, name: v })} maxLength={20} />
+                        </div>
+                        <div data-field="heroParams.title">
+                            <ConfigField label="Title" value={heroParams.title} onChange={v => setHeroParams({ ...heroParams, title: v })} maxLength={30} />
+                        </div>
+                        <div data-field="heroParams.subtitle">
+                            <ConfigField label="Subtitle" value={heroParams.subtitle} onChange={v => setHeroParams({ ...heroParams, subtitle: v })} maxLength={40} />
+                        </div>
+                        <div data-field="heroParams.location">
+                            <ConfigField label="Location" value={heroParams.location} onChange={v => setHeroParams({ ...heroParams, location: v })} maxLength={20} />
+                        </div>
 
 
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <Label>Style</Label>
-                                <Select value={heroParams.style} onChange={e => setHeroParams({ ...heroParams, style: e.target.value })} fullWidth>
+                                <Select value={heroParams.style} onChange={e => setHeroParams({ ...heroParams, style: e.target.value as any })} fullWidth>
                                     <option value="modern">Modern (Glass)</option>
                                     <option value="minimal">Minimal (B&W)</option>
                                     <option value="cyber">Cyber (Tech)</option>
@@ -726,6 +861,102 @@ export function TemplateSidebar({
                                             fullWidth
                                             maxLength={7}
                                             className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {selectedTemplate === 'retro' && (
+                    <>
+                        <div className="bg-[#111] p-3 rounded border border-gray-800 mb-2">
+                            <Label>Console Style</Label>
+                            <Select
+                                value={retroParams.style}
+                                onChange={(e) => setRetroParams({ ...retroParams, style: e.target.value as any })}
+                                fullWidth
+                                className="mt-1"
+                            >
+                                <option value="gameboy">Game Boy Classic</option>
+                                <option value="rpg">RPG Dialog Box</option>
+                            </Select>
+                        </div>
+
+                        <ConfigField
+                            label={retroParams.style === 'gameboy' ? "Player Name" : "Character Name"}
+                            value={retroParams.txt_1}
+                            onChange={v => setRetroParams({ ...retroParams, txt_1: v })}
+                        />
+                        <ConfigField
+                            label={retroParams.style === 'gameboy' ? "Level / Status" : "Dialog Text"}
+                            value={retroParams.txt_2}
+                            onChange={v => setRetroParams({ ...retroParams, txt_2: v })}
+                        />
+
+                        <div className="mt-2">
+                            <Label>Avatar / Sprite URL</Label>
+                            <div className="flex gap-2 items-center">
+                                <Input
+                                    value={retroParams.img_1}
+                                    onChange={(e) => setRetroParams({ ...retroParams, img_1: e.target.value })}
+                                    placeholder="https://..."
+                                    fullWidth
+                                    className="text-xs font-mono"
+                                />
+                                {retroParams.img_1 && (
+                                    <div className="w-8 h-8 rounded border border-gray-700 overflow-hidden shrink-0">
+                                        <img src={retroParams.img_1} className="w-full h-full object-cover" alt="Preview" />
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-[10px] text-gray-500 mt-1">Pixel art works best!</p>
+                        </div>
+
+                        <div className="mt-4 border-t border-gray-800 pt-4">
+                            <Label>Theme</Label>
+                            <Select
+                                value={retroParams.theme}
+                                onChange={(e) => setRetroParams({ ...retroParams, theme: e.target.value })}
+                                fullWidth
+                                className="mt-1"
+                            >
+                                {renderThemeOptions()}
+                            </Select>
+                        </div>
+
+                        {retroParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Color</Label>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="color"
+                                            value={retroParams.customColor}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor: e.target.value })}
+                                            className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
+                                        />
+                                        <Input
+                                            value={retroParams.customColor}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor: e.target.value })}
+                                            className="font-mono text-xs w-20"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Color</Label>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="color"
+                                            value={retroParams.customColor2}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor2: e.target.value })}
+                                            className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
+                                        />
+                                        <Input
+                                            value={retroParams.customColor2}
+                                            onChange={(e) => setRetroParams({ ...retroParams, customColor2: e.target.value })}
+                                            className="font-mono text-xs w-20"
                                         />
                                     </div>
                                 </div>

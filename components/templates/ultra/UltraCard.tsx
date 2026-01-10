@@ -18,9 +18,10 @@ interface UltraCardProps {
     content: string;
     icon: string;
     theme: any;
+    onFieldClick?: (field: string) => void;
 }
 
-export const UltraCard: React.FC<UltraCardProps> = ({ title, content, icon, theme }) => {
+export const UltraCard: React.FC<UltraCardProps> = ({ title, content, icon, theme, onFieldClick }) => {
     const width = 600;
     const height = 300;
     const lines = wrapText(content, 45);
@@ -46,16 +47,30 @@ export const UltraCard: React.FC<UltraCardProps> = ({ title, content, icon, them
 
             <g transform="translate(80, 90)">
                 {/* Icon Box */}
+                {/* Icon Box */}
                 <rect x="0" y="-20" width="48" height="48" rx="12" fill="rgba(255,255,255,0.1)" stroke={theme.border} />
-                <text x="24" y="12" textAnchor="middle" fontSize="24">{icon}</text>
+                <text
+                    x="24" y="12"
+                    textAnchor="middle"
+                    fontSize="24"
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); onFieldClick?.('ultraParams.icon') }}
+                >{icon}</text>
 
                 {/* Feature Label */}
                 <rect x="350" y="-15" width="80" height="24" rx="12" fill={theme.accent} fillOpacity="0.1" stroke={theme.accent} strokeOpacity="0.3" />
                 <text x="390" y="2" textAnchor="middle" fontSize="10" fontWeight="700" fill={theme.accent} letterSpacing="1">FEATURE</text>
 
-                <text x="0" y="60" fontSize="32" fontWeight="800" fill={theme.text}>{title}</text>
+                <text
+                    x="0" y="60"
+                    fontSize="32"
+                    fontWeight="800"
+                    fill={theme.text}
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => { e.stopPropagation(); onFieldClick?.('ultraParams.title') }}
+                >{title}</text>
 
-                <g transform="translate(0, 90)">
+                <g transform="translate(0, 90)" style={{ cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); onFieldClick?.('ultraParams.content') }}>
                     {lines.map((line, i) => (
                         <text key={i} x="0" y={i * 25} fontSize="18" fill={theme.secondary}>{line}</text>
                     ))}

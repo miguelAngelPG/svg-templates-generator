@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'retro';
 
 export interface AdvancedParams {
     content: string;
@@ -14,128 +14,155 @@ export interface AdvancedParams {
     layout: string;
 }
 
+
 export interface HeroParams {
     name: string;
     title: string;
     subtitle: string;
     location: string;
-    style: string;
+    style: 'modern' | 'minimal' | 'cyber' | 'terminal';
     theme: string;
     customColor: string;
     customColor2: string;
 }
 
+
 export interface UltraParams {
     component: 'stat' | 'quote' | 'card' | 'badge';
-    cardVariation?: 'default' | 'impact';
-    quoteVariation?: 'default' | 'philosophy';
     title: string;
-    content: string;
+    content: string; // Used for quote text or card description
     icon: string;
-    value: string;
-    label: string;
+    value: string; // For stat
+    label: string; // For stat
+    progress: number; // For stat (0-100)
+    footer: string; // For quote or card footer
     theme: string;
     customColor: string;
     customColor2: string;
-
-    // Optional fields for 'impact' variation
+    // New fields for Ultra Card & Quote variations
+    cardVariation: 'marketing' | 'profile' | 'code' | 'impact'; // Added impact
+    quoteVariation: 'classic' | 'modern' | 'minimal' | 'philosophy';
+    author: string; // For quote
+    role: string; // For quote or profile card
+    badgeText: string;
+    // Legacy / Specific fields
     company?: string;
     year?: string;
     tech?: string;
 }
 
 export interface StackParams {
+    style: 'grid' | 'carousel' | 'minimal';
     technologies: string[];
     theme: string;
+    iconStyle: 'original' | 'monochrome' | 'custom' | 'glass';
+    iconColor?: string;
     customColor: string;
     customColor2: string;
-    iconStyle: 'original' | 'monochrome' | 'glass' | 'custom';
-    iconColor: string;
     gap: number;
-    bgTransparent?: boolean;
+    bgTransparent: boolean;
 }
 
 export interface SocialParams {
     platforms: { provider: string; username: string }[];
-    style: 'icon-only' | 'badge' | 'card' | 'block' | 'minimal' | 'glass-grid';
+    style: 'badge' | 'card' | 'icon-only' | 'block' | 'minimal' | 'glass-grid';
     theme: string;
     customColor: string;
     customColor2: string;
 }
 
-
+export interface RetroParams {
+    style: 'gameboy' | 'rpg';
+    txt_1: string; // Player Name / Title
+    txt_2: string; // Level / Description
+    img_1: string; // Avatar URL
+    theme: string;
+    customColor: string;
+    customColor2: string;
+}
 
 export function useTemplateGenerator() {
     const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('advanced');
     const [generatedUrl, setGeneratedUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [activeField, setActiveField] = useState<string | null>(null);
 
-    // Template Specific States
     const [advancedParams, setAdvancedParams] = useState<AdvancedParams>({
-        content: 'Building the future with Next.js',
-        title: 'Project Update',
-        subtitle: 'Q1 2026 Roadmap',
+        content: 'This is an advanced SVG template with highly customizable properties.',
+        title: 'Advanced Template',
+        subtitle: 'Created with Next.js',
         width: 800,
         height: 400,
-        theme: 'custom', // Default to custom to show color picker potentially or just 'purple-cyan'
+        theme: 'dark',
         customColor: '#8855ff',
         customColor2: '#ffffff',
-        layout: 'center'
+        layout: 'standard'
     });
 
     const [heroParams, setHeroParams] = useState<HeroParams>({
-        name: 'Miguel A. Pacheco',
-        title: 'Tech Lead & Architect',
-        subtitle: 'Human first, Engineer second',
-        location: 'Hidalgo, MX',
-        theme: 'purple-cyan',
+        name: 'John Doe',
+        title: 'Full Stack Developer',
+        subtitle: 'Building digital experiences',
+        location: 'New York, USA',
         style: 'modern',
+        theme: 'dark',
         customColor: '#00f2ff',
         customColor2: '#ffffff'
     });
 
     const [ultraParams, setUltraParams] = useState<UltraParams>({
-        component: 'stat',
-        cardVariation: 'default',
-        quoteVariation: 'default',
-        title: '750+',
-        content: 'Commits in 2024',
-        icon: '🚀',
-        value: '12.5k',
-        label: 'Growth',
-        theme: 'purple-cyan',
-        customColor: '#00f2ff',
-        customColor2: '#ffffff',
-        // Defaults for impact
-        company: 'Tech Corp',
+        component: 'card',
+        title: 'Project Alpha',
+        content: 'A revolutionary new way to build web apps.',
+        icon: 'rocket',
+        value: '99%',
+        label: 'Performance',
+        progress: 75,
+        footer: 'Last updated 2 days ago',
+        theme: 'dark',
+        customColor: '#8855ff',
+        customColor2: '#ff0088',
+        cardVariation: 'profile',
+        quoteVariation: 'classic',
+        author: 'Albert Einstein',
+        role: 'Physicist',
+        badgeText: 'v2.0.0',
+        company: 'Acme Corp',
         year: '2024',
-        tech: 'React,Next.js,AWS'
+        tech: 'React, Next.js, Tailwind'
     });
 
     const [stackParams, setStackParams] = useState<StackParams>({
-        technologies: ['react', 'typescript', 'nextdotjs', 'tailwindcss'],
-        theme: 'purple-cyan',
+        style: 'grid',
+        technologies: ['react', 'nextjs', 'typescript', 'tailwindcss'],
+        theme: 'dark',
+        iconStyle: 'original',
         customColor: '#8855ff',
         customColor2: '#ffffff',
-        iconStyle: 'original',
-        iconColor: '#ffffff',
-        gap: 16,
+        gap: 12,
         bgTransparent: false
     });
 
     const [socialParams, setSocialParams] = useState<SocialParams>({
         platforms: [
             { provider: 'github', username: 'github' },
-            { provider: 'twitter', username: 'twitter' },
-            { provider: 'linkedin', username: '' }
+            { provider: 'twitter', username: 'twitter' }
         ],
         style: 'badge',
-        theme: 'purple-cyan',
+        theme: 'dark',
         customColor: '#8855ff',
         customColor2: '#ffffff'
     });
 
-
+    const [retroParams, setRetroParams] = useState<RetroParams>({
+        style: 'gameboy',
+        txt_1: 'Player 1',
+        txt_2: 'Level 99',
+        img_1: '', // Optional avatar
+        theme: 'custom',
+        customColor: '#8b8b8b', // Default GB grey/green
+        customColor2: '#ffffff'
+    });
 
     // Debounced Generation
     useEffect(() => {
@@ -145,6 +172,7 @@ export function useTemplateGenerator() {
             const params = new URLSearchParams();
 
             if (selectedTemplate === 'advanced') {
+                // ... existing advanced logic ...
                 const p = new URLSearchParams();
                 p.append('title', advancedParams.title);
                 p.append('content', advancedParams.content);
@@ -164,6 +192,7 @@ export function useTemplateGenerator() {
                 url = `/api/custom/advanced?${p.toString()}&t=${Date.now()}`;
 
             } else if (selectedTemplate === 'hero') {
+                // ... existing hero logic ...
                 const p = new URLSearchParams();
                 p.append('name', heroParams.name);
                 p.append('title', heroParams.title);
@@ -182,6 +211,7 @@ export function useTemplateGenerator() {
                 url = `/api/templates/hero?${p.toString()}&t=${Date.now()}`;
 
             } else if (selectedTemplate === 'ultra') {
+                // ... existing ultra logic ...
                 const p = new URLSearchParams();
                 p.append('component', ultraParams.component);
                 p.append('title', ultraParams.title);
@@ -198,19 +228,17 @@ export function useTemplateGenerator() {
                     p.append('secColor', c2);
                 }
 
-                // If it's the specific "Impact" variation of card, we route to the impact API 
-                // but map UltraParams to what Impact expects
                 if (ultraParams.component === 'card' && ultraParams.cardVariation === 'impact') {
-                    // Re-clean params for proper query string
+                    // Impact Logic
                     const pImp = new URLSearchParams();
                     pImp.append('company', ultraParams.company || 'Tech Corp');
-                    pImp.append('role', ultraParams.title); // Title = Role
+                    pImp.append('role', ultraParams.title);
                     pImp.append('year', ultraParams.year || '2024');
-                    pImp.append('stat', ultraParams.value); // Value = Stat
-                    pImp.append('desc', ultraParams.label); // Label = Stat Label
-                    pImp.append('description', ultraParams.content); // Content = Description
+                    pImp.append('stat', ultraParams.value);
+                    pImp.append('desc', ultraParams.label);
+                    pImp.append('description', ultraParams.content);
                     pImp.append('tech', ultraParams.tech || '');
-                    pImp.append('logo', ultraParams.icon); // Icon = Logo
+                    pImp.append('logo', ultraParams.icon);
                     pImp.append('theme', ultraParams.theme);
 
                     if (ultraParams.theme === 'custom') {
@@ -218,16 +246,15 @@ export function useTemplateGenerator() {
                         const c2 = ultraParams.customColor2 || '#ffffff';
                         pImp.append('customColor2', c2);
                     }
-
                     url = `/api/templates/impact?${pImp.toString()}&t=${Date.now()}`;
 
                 } else if (ultraParams.component === 'quote' && ultraParams.quoteVariation === 'philosophy') {
-                    // Route to Philosophy API
+                    // Philosophy Logic
                     const pPhil = new URLSearchParams();
                     pPhil.append('title', ultraParams.title);
-                    pPhil.append('quote', ultraParams.content); // Content = Quote
+                    pPhil.append('quote', ultraParams.content);
                     pPhil.append('icon', ultraParams.icon);
-                    pPhil.append('footer', ultraParams.label); // Label = Footer
+                    pPhil.append('footer', ultraParams.label);
                     pPhil.append('theme', ultraParams.theme);
 
                     if (ultraParams.theme === 'custom') {
@@ -235,18 +262,20 @@ export function useTemplateGenerator() {
                         const c2 = ultraParams.customColor2 || '#ffffff';
                         pPhil.append('customColor2', c2);
                     }
-
                     url = `/api/templates/philosophy?${pPhil.toString()}&t=${Date.now()}`;
                 } else {
                     url = `/api/custom/ultra?${p.toString()}&t=${Date.now()}`;
                 }
 
             } else if (selectedTemplate === 'stack') {
+                // ... existing stack logic ...
                 const p = new URLSearchParams();
                 p.append('technologies', stackParams.technologies.join(','));
                 p.append('theme', stackParams.theme);
                 p.append('iconStyle', stackParams.iconStyle);
-                p.append('iconColor', stackParams.iconColor.replace('#', '')); // Send without hash
+                if (stackParams.iconColor) {
+                    p.append('iconColor', stackParams.iconColor.replace('#', ''));
+                }
                 p.append('gap', String(stackParams.gap));
                 if (stackParams.bgTransparent) p.append('bgTransparent', 'true');
 
@@ -256,9 +285,10 @@ export function useTemplateGenerator() {
                     p.append('customColor2', c2);
                     p.append('secColor', c2);
                 }
-
                 url = `/api/custom/stack?${p.toString()}&t=${Date.now()}`;
+
             } else if (selectedTemplate === 'social') {
+                // ... existing social logic ...
                 const p = new URLSearchParams();
                 const validPlatforms = socialParams.platforms.filter(p => p.provider.trim() !== '');
                 const platformString = validPlatforms.map(pt => `${pt.provider}:${pt.username}`).join(',');
@@ -273,29 +303,43 @@ export function useTemplateGenerator() {
                     p.append('customColor2', c2);
                     p.append('secColor', c2);
                 }
-
                 url = `/api/custom/social?${p.toString()}&t=${Date.now()}`;
+
+            } else if (selectedTemplate === 'retro') {
+                // Retro Logic
+                const p = new URLSearchParams();
+                p.append('style', retroParams.style);
+                p.append('txt_1', retroParams.txt_1);
+                p.append('txt_2', retroParams.txt_2);
+                p.append('img_1', retroParams.img_1);
+                p.append('theme', retroParams.theme);
+
+                if (retroParams.theme === 'custom') {
+                    p.append('customColor', retroParams.customColor || '#8b8b8b');
+                    const c2 = retroParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                }
+                url = `/api/templates/retro?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
-            // Artificial delay
             setTimeout(() => setIsLoading(false), 300);
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, retroParams]);
 
     return {
         selectedTemplate,
         setSelectedTemplate,
         generatedUrl,
         isLoading,
-        // State Accessors
         advancedParams, setAdvancedParams,
         heroParams, setHeroParams,
         ultraParams, setUltraParams,
         stackParams, setStackParams,
         socialParams, setSocialParams,
-
+        retroParams, setRetroParams,
+        activeField, setActiveField
     };
 }

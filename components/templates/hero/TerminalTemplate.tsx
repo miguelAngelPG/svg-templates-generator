@@ -85,7 +85,7 @@ export const TerminalTemplate: React.FC<TerminalTemplateProps> = ({ name, title,
                 }}>
                     {/* Line 1: Whoami */}
                     <div style={{ display: 'flex' }}>
-                        <span style={{ color: theme.secondary || '#7aa2f7' }}>visitor@portfolio</span>
+                        <span style={{ color: theme.blob1 || '#7aa2f7' }}>visitor@portfolio</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>:</span>
                         <span style={{ color: theme.accent || '#bb9af7' }}>~</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>$</span>
@@ -97,7 +97,7 @@ export const TerminalTemplate: React.FC<TerminalTemplateProps> = ({ name, title,
 
                     {/* Line 2: Role */}
                     <div style={{ display: 'flex', marginTop: '10px' }}>
-                        <span style={{ color: theme.secondary || '#7aa2f7' }}>visitor@portfolio</span>
+                        <span style={{ color: theme.blob1 || '#7aa2f7' }}>visitor@portfolio</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>:</span>
                         <span style={{ color: theme.accent || '#bb9af7' }}>~</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>$</span>
@@ -110,7 +110,7 @@ export const TerminalTemplate: React.FC<TerminalTemplateProps> = ({ name, title,
 
                     {/* Line 3: Location */}
                     <div style={{ display: 'flex', marginTop: '10px' }}>
-                        <span style={{ color: theme.secondary || '#7aa2f7' }}>visitor@portfolio</span>
+                        <span style={{ color: theme.blob1 || '#7aa2f7' }}>visitor@portfolio</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>:</span>
                         <span style={{ color: theme.accent || '#bb9af7' }}>~</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>$</span>
@@ -122,7 +122,7 @@ export const TerminalTemplate: React.FC<TerminalTemplateProps> = ({ name, title,
 
                     {/* Cursor */}
                     <div style={{ display: 'flex', marginTop: '10px' }}>
-                        <span style={{ color: theme.secondary || '#7aa2f7' }}>visitor@portfolio</span>
+                        <span style={{ color: theme.blob1 || '#7aa2f7' }}>visitor@portfolio</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>:</span>
                         <span style={{ color: theme.accent || '#bb9af7' }}>~</span>
                         <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 8px' }}>$</span>

@@ -11,6 +11,7 @@ import { MinimalTemplate } from '../templates/hero/MinimalTemplate';
 import { CyberTemplate } from '../templates/hero/CyberTemplate';
 import { UltraStat } from '../templates/ultra/UltraStat';
 import { UltraQuote } from '../templates/ultra/UltraQuote';
+import { ActionButtons } from '../molecules/ActionButtons';
 import { UltraCard } from '../templates/ultra/UltraCard';
 import { UltraBadge } from '../templates/ultra/UltraBadge';
 import { TechStackRow } from '../templates/stack/TechStackRow';
@@ -255,34 +256,15 @@ export function TemplatePreview({
                         </span>
                     </div>
 
-                    <div className="flex gap-2">
-                        <Button
-                            variant="primary"
-                            className="py-1 px-3 text-xs h-8"
-                            onClick={handleCopyMarkdown}
-                            icon={<Github className="w-3 h-3" />}
-                        >
-                            Copy for GitHub
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="py-1 px-3 text-xs h-8"
-                            onClick={() => window.open(fullUrl, '_blank')}
-                            icon={<ExternalLink className="w-3 h-3" />}
-                        >
-                            Open URL
-                        </Button>
-                    </div>
+                    {/* Action Buttons */}
+                    <ActionButtons generatedUrl={generatedUrl} templateName={templateName} />
                 </div>
-
+                {/* Preview Area */}
                 <div className="flex-1 flex items-center justify-center p-8 pt-12 overflow-hidden bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-opacity-5 relative">
-
-                    {/* Render Container */}
                     <div
                         style={{
                             width: renderPreview.width,
                             height: renderPreview.height,
-                            // Scale down if too big for container
                             maxWidth: '100%',
                             maxHeight: '100%',
                             transformOrigin: 'center center',
@@ -290,34 +272,34 @@ export function TemplatePreview({
                         }}
                         className="transition-all duration-300 relative"
                     >
-                        {/* This renders the actual React component! */}
                         {renderPreview.component}
                     </div>
-
                 </div>
+            </div>
 
-                <div className="p-4 bg-[#111] border-t border-gray-800 flex flex-col gap-4">
-                    <div>
-                        <Label>GitHub Markdown</Label>
-                        <div className="flex gap-2">
-                            <Input
-                                value={`![${templateName}](${fullUrl})`}
-                                readOnly
-                                fullWidth
-                                onClick={(e) => e.currentTarget.select()}
-                                className="font-mono text-xs text-cyan-400"
-                            />
-                            <Button
-                                variant="outline"
-                                className="w-12 px-0 shrink-0"
-                                onClick={handleCopyMarkdown}
-                                title="Copy Markdown"
-                                icon={<Copy className="w-4 h-4" />}
-                            />
-                        </div>
+            {/* Bottom Panel */}
+            <div className="p-4 bg-[#111] border-t border-gray-800 flex flex-col gap-4">
+                <div>
+                    <Label>GitHub Markdown</Label>
+                    <div className="flex gap-2">
+                        <Input
+                            value={`![${templateName}](${fullUrl})`}
+                            readOnly
+                            fullWidth
+                            onClick={(e) => e.currentTarget.select()}
+                            className="font-mono text-xs text-cyan-400"
+                        />
+                        <Button
+                            variant="outline"
+                            className="w-12 px-0 shrink-0"
+                            onClick={handleCopyMarkdown}
+                            title="Copy Markdown"
+                            icon={<Copy className="w-4 h-4" />}
+                        />
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+

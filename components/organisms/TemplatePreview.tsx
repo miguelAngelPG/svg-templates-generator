@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Download, Copy, ExternalLink, Github, Eye } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
@@ -18,7 +18,9 @@ import { PhilosophyTemplate } from '../templates/philosophy/PhilosophyTemplate';
 import { ImpactTemplate } from '../templates/impact/ImpactTemplate';
 
 import { getTheme } from '@/utils/themes';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams, ImpactParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
+import { fetchSocialIcons, SocialPlatform } from '@/utils/social-icons';
+import { SocialTemplate } from '../templates/social/SocialTemplate';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -31,8 +33,8 @@ interface TemplatePreviewProps {
     ultraParams: UltraParams;
     stackParams: StackParams;
     socialParams: SocialParams;
-    philosophyParams: PhilosophyParams;
-    impactParams: ImpactParams;
+
+
 }
 
 export function TemplatePreview({
@@ -44,11 +46,24 @@ export function TemplatePreview({
     ultraParams,
     stackParams,
     socialParams,
-    philosophyParams,
-    impactParams
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
+
+    // --- Social Icons Fetching (Client Side) ---
+    const [socialPlatforms, setSocialPlatforms] = useState<SocialPlatform[]>([]);
+    const [isFetchingIcons, setIsFetchingIcons] = useState(false);
+
+    useEffect(() => {
+        if (templateName === 'social') {
+            setIsFetchingIcons(true);
+            const rawPlatforms = socialParams.platforms.filter(p => p.provider);
+            fetchSocialIcons(rawPlatforms).then(icons => {
+                setSocialPlatforms(icons);
+                setIsFetchingIcons(false);
+            });
+        }
+    }, [templateName, socialParams.platforms]);
 
     const handleCopyMarkdown = () => {
         const markdown = `![${templateName}](${fullUrl})`;
@@ -96,8 +111,55 @@ export function TemplatePreview({
             // Render the REACT COMPONENT directly. 
             // It is now a Pure SVG component, so it renders exactly as the server string.
             if (ultraParams.component === 'stat') component = <UltraStat {...ultraParams} theme={ultraTheme} />;
-            else if (ultraParams.component === 'quote') component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
-            else if (ultraParams.component === 'card') component = <UltraCard {...ultraParams} theme={ultraTheme} />;
+            else if (ultraParams.component === 'quote') {
+                if (ultraParams.quoteVariation === 'philosophy') {
+                    // Map UltraParams to PhilosophyTemplateProps
+                    const philTheme = {
+                        bg: theme.bg,
+                        bgGradient: theme.bgGradient,
+                        primary: theme.accent,
+                        secondary: theme.blob1 || theme.accent,
+                    };
+
+                    component = (
+                        <PhilosophyTemplate
+                            title={ultraParams.title}
+                            quote={ultraParams.content}
+                            icon={ultraParams.icon}
+                            footer={ultraParams.label}
+                            theme={philTheme}
+                        />
+                    );
+                } else {
+                    component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
+                }
+            }
+            else if (ultraParams.component === 'card') {
+                if (ultraParams.cardVariation === 'impact') {
+                    // Map UltraParams to ImpactTemplateProps
+                    const impactTheme = {
+                        primary: theme.accent,
+                        secondary: theme.blob1 || theme.accent,
+                        accent: theme.blob2 || '#ffffff'
+                    };
+
+                    component = (
+                        <ImpactTemplate
+                            company={ultraParams.company || 'Tech Corp'}
+                            role={ultraParams.title}
+                            year={ultraParams.year || '2024'}
+                            stat={ultraParams.value}
+                            statDesc={ultraParams.label}
+                            description={ultraParams.content}
+                            techArray={(ultraParams.tech || '').split(',').map(t => t.trim()).slice(0, 4)}
+                            logo={ultraParams.icon}
+                            theme={impactTheme}
+                        />
+                    );
+                } else {
+                    component = <UltraCard {...ultraParams} theme={ultraTheme} />;
+                }
+            }
             else if (ultraParams.component === 'badge') component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
         }
         else if (templateName === 'stack') {
@@ -118,78 +180,53 @@ export function TemplatePreview({
             );
         }
         else if (templateName === 'social') {
-            width = 800;
-            height = socialParams.style === 'card' ? 400 : 100;
+            const theme = getTheme(socialParams.theme, socialParams.customColor, socialParams.customColor2);
 
-            // For Social, we rely on the API generation for now as it handles complex icon fetching/masking
+            // Dimensions Logic matching API
+            if (socialParams.style === 'card') {
+                width = 400;
+                height = socialPlatforms.length * 50 + 60;
+            } else if (socialParams.style === 'block') {
+                width = 400;
+                height = socialPlatforms.length * 60 + 40;
+            } else if (socialParams.style === 'minimal') {
+                width = 300;
+                height = socialPlatforms.length * 30 + 20;
+            } else if (socialParams.style === 'glass-grid') {
+                width = 500;
+                const rows = Math.ceil(socialPlatforms.length / 2);
+                height = rows * 100 + 40;
+            } else {
+                width = 800;
+                height = 100;
+            }
+
+            // Adjust dimensions for preview container if needed, 
+            // but rely on 'maxWidth: 100%' in parent to handle scaling.
+
             component = (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {isLoading ? (
-                        <span className="text-gray-500 text-xs animate-pulse">Generating Social Hub...</span>
+                    {isFetchingIcons ? (
+                        <span className="text-gray-500 text-xs animate-pulse">Fetching Icons...</span>
                     ) : (
-                        <img
-                            src={generatedUrl}
-                            alt="Social Hub Preview"
-                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                        />
+                        /* Wrap in a container to simulate the SVG root for Satori-like behavior */
+                        <div style={{ width: width, height: height, display: 'flex' }}>
+                            <SocialTemplate
+                                platforms={socialPlatforms}
+                                style={socialParams.style}
+                                theme={theme}
+                            />
+                        </div>
                     )}
                 </div>
             );
         }
-        else if (templateName === 'philosophy') {
-            width = 800;
-            height = 250;
-            const theme = getTheme(philosophyParams.theme, philosophyParams.customColor, philosophyParams.customColor2);
 
-            // Map theme to Philosophy format
-            const philosophyTheme = {
-                bg: theme.bg,
-                bgGradient: theme.bgGradient || theme.bg,
-                primary: theme.accent,
-                secondary: theme.blob1 || '#ffffff'
-            };
 
-            component = (
-                <PhilosophyTemplate
-                    title={philosophyParams.title}
-                    quote={philosophyParams.quote}
-                    icon={philosophyParams.icon}
-                    lang={philosophyParams.lang}
-                    theme={philosophyTheme}
-                />
-            );
-        }
-        else if (templateName === 'impact') {
-            width = 380;
-            height = 420;
-            const theme = getTheme(impactParams.theme, impactParams.customColor, impactParams.customColor2);
-
-            // Map theme to Impact format (Needs primary, secondary, accent)
-            // We can map from our standard theme keys
-            const impactTheme = {
-                primary: theme.accent, // The main glowing color
-                secondary: theme.blob1 || theme.accent, // Secondary gradient color
-                accent: theme.blob2 || '#ffffff' // Text accent
-            };
-
-            component = (
-                <ImpactTemplate
-                    company={impactParams.company}
-                    role={impactParams.role}
-                    year={impactParams.year}
-                    stat={impactParams.stat}
-                    statDesc={impactParams.statDesc}
-                    description={impactParams.description}
-                    techArray={impactParams.tech.split(',').map(t => t.trim()).slice(0, 4)}
-                    logo={impactParams.logo}
-                    theme={impactTheme}
-                />
-            );
-        }
 
         return { component, width, height };
 
-    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams, impactParams, generatedUrl, isLoading]);
+    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, generatedUrl, isLoading]);
 
     return (
         <div className="flex flex-col gap-6 h-full">

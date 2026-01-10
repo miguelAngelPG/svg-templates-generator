@@ -17,9 +17,7 @@ export default function TemplatesPage() {
         heroParams, setHeroParams,
         ultraParams, setUltraParams,
         stackParams, setStackParams,
-        socialParams, setSocialParams,
-        philosophyParams, setPhilosophyParams,
-        impactParams, setImpactParams
+        socialParams, setSocialParams
     } = useTemplateGenerator();
 
     return (
@@ -44,12 +42,6 @@ export default function TemplatesPage() {
 
                 socialParams={socialParams}
                 setSocialParams={setSocialParams}
-
-                philosophyParams={philosophyParams}
-                setPhilosophyParams={setPhilosophyParams}
-
-                impactParams={impactParams}
-                setImpactParams={setImpactParams}
             />
 
             {/* Preview Panel */}
@@ -62,8 +54,6 @@ export default function TemplatesPage() {
                 ultraParams={ultraParams}
                 stackParams={stackParams}
                 socialParams={socialParams}
-                philosophyParams={philosophyParams}
-                impactParams={impactParams}
             />
 
         </div>

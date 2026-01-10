@@ -4,7 +4,8 @@ interface PhilosophyTemplateProps {
     title: string;
     quote: string;
     icon: string;
-    lang: string;
+    lang?: string;
+    footer?: string;
     theme: {
         bg: string;
         bgGradient: string;
@@ -17,7 +18,8 @@ export const PhilosophyTemplate = ({
     title,
     quote,
     icon,
-    lang,
+    lang = 'en',
+    footer,
     theme,
 }: PhilosophyTemplateProps) => {
     return (
@@ -122,7 +124,7 @@ export const PhilosophyTemplate = ({
                                     color: `${theme.primary}99`, // 60% opacity
                                     fontWeight: 300
                                 }}>
-                                    — {lang === 'es' ? 'Filosofía Personal' : 'Personal Philosophy'}
+                                    — {footer || (lang === 'es' ? 'Filosofía Personal' : 'Personal Philosophy')}
                                 </div>
                             </div>
                         </div>

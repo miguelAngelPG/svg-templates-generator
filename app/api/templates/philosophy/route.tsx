@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     const quote = searchParams.get('quote') || 'Technology is the tool, empathy is the engine.';
     const icon = searchParams.get('icon') || '⚛';
     const lang = searchParams.get('lang') || 'en';
+    const footer = searchParams.get('footer') || undefined;
     const themeName = searchParams.get('theme') || 'orange-pink'; // Default to a warm theme if not specified
     const customColor = searchParams.get('customColor') || undefined;
 
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
         quote={quote}
         icon={icon}
         lang={lang}
+        footer={footer}
         theme={theme}
       />,
       {

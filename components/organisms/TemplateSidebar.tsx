@@ -4,7 +4,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams, ImpactParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
 import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
@@ -28,11 +28,9 @@ interface TemplateSidebarProps {
     socialParams: SocialParams;
     setSocialParams: (val: SocialParams) => void;
 
-    philosophyParams: PhilosophyParams;
-    setPhilosophyParams: (val: PhilosophyParams) => void;
 
-    impactParams: ImpactParams;
-    setImpactParams: (val: ImpactParams) => void;
+
+
 }
 
 export function TemplateSidebar({
@@ -41,9 +39,7 @@ export function TemplateSidebar({
     heroParams, setHeroParams,
     ultraParams, setUltraParams,
     stackParams, setStackParams,
-    socialParams, setSocialParams,
-    philosophyParams, setPhilosophyParams,
-    impactParams, setImpactParams
+    socialParams, setSocialParams
 }: TemplateSidebarProps) {
 
     // Helper to render theme options dynamically
@@ -81,8 +77,6 @@ export function TemplateSidebar({
                     <option value="ultra">Ultra Components (Stats)</option>
                     <option value="stack">Tech Stack (By Readme Forge)</option>
                     <option value="social">Social Hub (Connect)</option>
-                    <option value="philosophy">Philosophy (Personal)</option>
-                    <option value="impact">Impact Card (Resume)</option>
                 </Select>
             </div>
 
@@ -239,6 +233,37 @@ export function TemplateSidebar({
                                     <option value="badge">Badge</option>
                                 </Select>
                             </div>
+
+                            {/* Card Variation Selector */}
+                            {ultraParams.component === 'card' && (
+                                <div className="col-span-2">
+                                    <Label>Card Style</Label>
+                                    <Select
+                                        value={ultraParams.cardVariation || 'default'}
+                                        onChange={e => setUltraParams({ ...ultraParams, cardVariation: e.target.value as any })}
+                                        fullWidth
+                                    >
+                                        <option value="default">Standard Ultra</option>
+                                        <option value="impact">Impact (Resume Highlighting)</option>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {/* Quote Variation Selector */}
+                            {ultraParams.component === 'quote' && (
+                                <div className="col-span-2">
+                                    <Label>Quote Style</Label>
+                                    <Select
+                                        value={ultraParams.quoteVariation || 'default'}
+                                        onChange={e => setUltraParams({ ...ultraParams, quoteVariation: e.target.value as any })}
+                                        fullWidth
+                                    >
+                                        <option value="default">Standard Ultra Quote</option>
+                                        <option value="philosophy">Philosophy (Glass/Duotone)</option>
+                                    </Select>
+                                </div>
+                            )}
+
                             <div>
                                 <Label>Theme</Label>
                                 <Select value={ultraParams.theme} onChange={e => setUltraParams({ ...ultraParams, theme: e.target.value })} fullWidth>
@@ -290,8 +315,38 @@ export function TemplateSidebar({
                             </div>
                         )}
 
-                        {/* Layout for Badge: Icon + Value + Title in one row */}
-                        {ultraParams.component === 'badge' ? (
+                        {/* Layout for Quote (Standard & Philosophy) */}
+                        {ultraParams.component === 'quote' ? (
+                            <>
+                                <div className="flex gap-2 mb-2">
+                                    <div className="w-1/4">
+                                        <ConfigField
+                                            label="Icon"
+                                            value={ultraParams.icon}
+                                            onChange={v => setUltraParams({ ...ultraParams, icon: v })}
+                                            maxLength={2}
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <ConfigField
+                                            label={ultraParams.quoteVariation === 'philosophy' ? 'Title / Author' : 'Title / Author'}
+                                            value={ultraParams.title}
+                                            onChange={v => setUltraParams({ ...ultraParams, title: v })}
+                                            maxLength={30}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Footer / Label for Quote */}
+                                <div className="mb-2">
+                                    <ConfigField
+                                        label={ultraParams.quoteVariation === 'philosophy' ? 'Footer (e.g. Personal Philosophy)' : 'Footer / Caption'}
+                                        value={ultraParams.label}
+                                        onChange={v => setUltraParams({ ...ultraParams, label: v })}
+                                        maxLength={30}
+                                    />
+                                </div>
+                            </>
+                        ) : ultraParams.component === 'badge' ? (
                             <div className="flex gap-2 mb-2">
                                 <div className="w-[15%]">
                                     <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
@@ -304,15 +359,17 @@ export function TemplateSidebar({
                                 </div>
                             </div>
                         ) : (
-                            /* Standard Layout for others */
-                            <div className="flex gap-2 mb-2">
-                                <div className="w-1/4">
-                                    <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
+                            /* Standard Layout for others (Stat, Card-Default) */
+                            ultraParams.component !== 'card' || ultraParams.cardVariation !== 'impact' ? (
+                                <div className="flex gap-2 mb-2">
+                                    <div className="w-1/4">
+                                        <ConfigField label="Icon" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={25} />
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <ConfigField label="Title" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={25} />
-                                </div>
-                            </div>
+                            ) : null
                         )}
 
                         {/* Extra fields for Stat only */}
@@ -339,6 +396,49 @@ export function TemplateSidebar({
                             />
                         </div>
                     </>
+                )}
+
+                {/* Impact Variation inside Ultra */}
+                {selectedTemplate === 'ultra' && ultraParams.component === 'card' && ultraParams.cardVariation === 'impact' && (
+                    <div className="mt-4 border-t border-gray-800 pt-4">
+                        <Label className="text-cyan-400 mb-2 block">Impact Card Details</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {/* Company stored in specialized optional field */}
+                            <ConfigField label="Company" value={ultraParams.company || ''} onChange={v => setUltraParams({ ...ultraParams, company: v })} maxLength={20} />
+                            {/* Role matches Title */}
+                            <ConfigField label="Role" value={ultraParams.title} onChange={v => setUltraParams({ ...ultraParams, title: v })} maxLength={25} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            {/* Year stored in specialized optional field */}
+                            <ConfigField label="Year/Badge" value={ultraParams.year || ''} onChange={v => setUltraParams({ ...ultraParams, year: v })} maxLength={15} />
+                            {/* Logo matches Icon */}
+                            <ConfigField label="Logo/Emoji" value={ultraParams.icon} onChange={v => setUltraParams({ ...ultraParams, icon: v })} maxLength={2} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            {/* Stat matches Value */}
+                            <ConfigField label="Big Stat" value={ultraParams.value} onChange={v => setUltraParams({ ...ultraParams, value: v })} maxLength={8} />
+                            {/* Stat Label matches Label */}
+                            <ConfigField label="Stat Label" value={ultraParams.label} onChange={v => setUltraParams({ ...ultraParams, label: v })} maxLength={20} />
+                        </div>
+
+                        <div className="mt-2">
+                            {/* Description matches Content */}
+                            <Label>Description</Label>
+                            <textarea
+                                value={ultraParams.content}
+                                onChange={(e) => setUltraParams({ ...ultraParams, content: e.target.value })}
+                                maxLength={120}
+                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-16 resize-none mt-1"
+                            />
+                        </div>
+
+                        <div className="mt-2">
+                            {/* Tech stored in specialized optional field */}
+                            <ConfigField label="Tech Stack (comma sep)" value={ultraParams.tech || ''} onChange={v => setUltraParams({ ...ultraParams, tech: v })} maxLength={50} />
+                        </div>
+                    </div>
                 )}
 
                 {/* Stack Configuration */}
@@ -633,169 +733,9 @@ export function TemplateSidebar({
                     </>
                 )}
 
-                {/* Philosophy Configuration */}
-                {selectedTemplate === 'philosophy' && (
-                    <>
-                        <ConfigField label="Section Title" value={philosophyParams.title} onChange={v => setPhilosophyParams({ ...philosophyParams, title: v })} maxLength={40} />
-
-                        <div>
-                            <Label>Personal Quote</Label>
-                            <textarea
-                                value={philosophyParams.quote}
-                                onChange={(e) => setPhilosophyParams({ ...philosophyParams, quote: e.target.value })}
-                                maxLength={100}
-                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-20 resize-none mt-1"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2 mt-2">
-                            <ConfigField label="Icon/Emoji" value={philosophyParams.icon} onChange={v => setPhilosophyParams({ ...philosophyParams, icon: v })} maxLength={2} />
-
-                            <div>
-                                <Label>Lang</Label>
-                                <Select value={philosophyParams.lang} onChange={e => setPhilosophyParams({ ...philosophyParams, lang: e.target.value as any })} fullWidth>
-                                    <option value="en">English</option>
-                                    <option value="es">Español</option>
-                                </Select>
-                            </div>
-                        </div>
-
-                        <div className="mt-2">
-                            <Label>Theme</Label>
-                            <Select value={philosophyParams.theme} onChange={e => setPhilosophyParams({ ...philosophyParams, theme: e.target.value })} fullWidth>
-                                {renderThemeOptions()}
-                            </Select>
-                        </div>
-
-                        {philosophyParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
-                                <div>
-                                    <Label>Primary Acc.</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="color"
-                                            value={philosophyParams.customColor || '#ffaa40'}
-                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor: e.target.value })}
-                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={philosophyParams.customColor || '#ffaa40'}
-                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor: e.target.value })}
-                                            fullWidth
-                                            maxLength={7}
-                                            className="text-xs"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label>Secondary Acc.</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="color"
-                                            value={philosophyParams.customColor2 || '#ffffff'}
-                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor2: e.target.value })}
-                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={philosophyParams.customColor2 || '#ffffff'}
-                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor2: e.target.value })}
-                                            fullWidth
-                                            maxLength={7}
-                                            className="text-xs"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
-
-                {/* Impact Configuration */}
-                {selectedTemplate === 'impact' && (
-                    <>
-                        <div className="grid grid-cols-2 gap-2">
-                            <ConfigField label="Company" value={impactParams.company} onChange={v => setImpactParams({ ...impactParams, company: v })} maxLength={20} />
-                            <ConfigField label="Role" value={impactParams.role} onChange={v => setImpactParams({ ...impactParams, role: v })} maxLength={25} />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2 mt-2">
-                            <ConfigField label="Year/Badge" value={impactParams.year} onChange={v => setImpactParams({ ...impactParams, year: v })} maxLength={15} />
-                            <ConfigField label="Logo/Emoji" value={impactParams.logo} onChange={v => setImpactParams({ ...impactParams, logo: v })} maxLength={2} />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2 mt-2">
-                            <ConfigField label="Big Stat" value={impactParams.stat} onChange={v => setImpactParams({ ...impactParams, stat: v })} maxLength={8} />
-                            <ConfigField label="Stat Label" value={impactParams.statDesc} onChange={v => setImpactParams({ ...impactParams, statDesc: v })} maxLength={20} />
-                        </div>
-
-                        <div className="mt-2">
-                            <Label>Description</Label>
-                            <textarea
-                                value={impactParams.description}
-                                onChange={(e) => setImpactParams({ ...impactParams, description: e.target.value })}
-                                maxLength={120}
-                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-16 resize-none mt-1"
-                            />
-                        </div>
-
-                        <div className="mt-2">
-                            <ConfigField label="Tech Stack (comma sep)" value={impactParams.tech} onChange={v => setImpactParams({ ...impactParams, tech: v })} maxLength={50} />
-                        </div>
 
 
-                        <div className="mt-2">
-                            <Label>Theme</Label>
-                            <Select value={impactParams.theme} onChange={e => setImpactParams({ ...impactParams, theme: e.target.value })} fullWidth>
-                                {renderThemeOptions()}
-                            </Select>
-                        </div>
 
-                        {impactParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
-                                <div>
-                                    <Label>Primary Acc.</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="color"
-                                            value={impactParams.customColor || '#00f2ff'}
-                                            onChange={e => setImpactParams({ ...impactParams, customColor: e.target.value })}
-                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={impactParams.customColor || '#00f2ff'}
-                                            onChange={e => setImpactParams({ ...impactParams, customColor: e.target.value })}
-                                            fullWidth
-                                            maxLength={7}
-                                            className="text-xs"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label>Secondary Acc.</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="color"
-                                            value={impactParams.customColor2 || '#ffffff'}
-                                            onChange={e => setImpactParams({ ...impactParams, customColor2: e.target.value })}
-                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
-                                        />
-                                        <Input
-                                            type="text"
-                                            value={impactParams.customColor2 || '#ffffff'}
-                                            onChange={e => setImpactParams({ ...impactParams, customColor2: e.target.value })}
-                                            fullWidth
-                                            maxLength={7}
-                                            className="text-xs"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
 
             </div>
         </div >

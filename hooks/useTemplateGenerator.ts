@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'philosophy' | 'impact';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social';
 
 export interface AdvancedParams {
     content: string;
@@ -27,6 +27,8 @@ export interface HeroParams {
 
 export interface UltraParams {
     component: 'stat' | 'quote' | 'card' | 'badge';
+    cardVariation?: 'default' | 'impact';
+    quoteVariation?: 'default' | 'philosophy';
     title: string;
     content: string;
     icon: string;
@@ -35,6 +37,11 @@ export interface UltraParams {
     theme: string;
     customColor: string;
     customColor2: string;
+
+    // Optional fields for 'impact' variation
+    company?: string;
+    year?: string;
+    tech?: string;
 }
 
 export interface StackParams {
@@ -56,29 +63,7 @@ export interface SocialParams {
     customColor2: string;
 }
 
-export interface PhilosophyParams {
-    title: string;
-    quote: string;
-    icon: string;
-    lang: 'en' | 'es';
-    theme: string;
-    customColor: string;
-    customColor2: string;
-}
 
-export interface ImpactParams {
-    company: string;
-    role: string;
-    year: string;
-    stat: string;
-    statDesc: string;
-    description: string;
-    tech: string;
-    logo: string;
-    theme: string;
-    customColor: string;
-    customColor2: string;
-}
 
 export function useTemplateGenerator() {
     const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('advanced');
@@ -111,14 +96,20 @@ export function useTemplateGenerator() {
 
     const [ultraParams, setUltraParams] = useState<UltraParams>({
         component: 'stat',
-        title: 'Total Users',
-        content: 'Verified Creator 😊',
+        cardVariation: 'default',
+        quoteVariation: 'default',
+        title: '750+',
+        content: 'Commits in 2024',
         icon: '🚀',
         value: '12.5k',
         label: 'Growth',
         theme: 'purple-cyan',
         customColor: '#00f2ff',
-        customColor2: '#ffffff'
+        customColor2: '#ffffff',
+        // Defaults for impact
+        company: 'Tech Corp',
+        year: '2024',
+        tech: 'React,Next.js,AWS'
     });
 
     const [stackParams, setStackParams] = useState<StackParams>({
@@ -144,29 +135,7 @@ export function useTemplateGenerator() {
         customColor2: '#ffffff'
     });
 
-    const [philosophyParams, setPhilosophyParams] = useState<PhilosophyParams>({
-        title: 'The Person Behind the Code',
-        quote: 'Technology is the tool, empathy is the engine.',
-        icon: '⚛',
-        lang: 'en',
-        theme: 'orange-pink',
-        customColor: '#ffaa40',
-        customColor2: '#ffffff'
-    });
 
-    const [impactParams, setImpactParams] = useState<ImpactParams>({
-        company: 'Tech Corp',
-        role: 'Senior Engineer',
-        year: '2024 - Present',
-        stat: '+40%',
-        statDesc: 'Performance Boost',
-        description: 'Led the migration to micro-frontends reducing build times by 60%.',
-        tech: 'React,Next.js,TypeScript,AWS',
-        logo: '🚀',
-        theme: 'cyan',
-        customColor: '#00f2ff',
-        customColor2: '#ffffff'
-    });
 
     // Debounced Generation
     useEffect(() => {
@@ -229,7 +198,48 @@ export function useTemplateGenerator() {
                     p.append('secColor', c2);
                 }
 
-                url = `/api/custom/ultra?${p.toString()}&t=${Date.now()}`;
+                // If it's the specific "Impact" variation of card, we route to the impact API 
+                // but map UltraParams to what Impact expects
+                if (ultraParams.component === 'card' && ultraParams.cardVariation === 'impact') {
+                    // Re-clean params for proper query string
+                    const pImp = new URLSearchParams();
+                    pImp.append('company', ultraParams.company || 'Tech Corp');
+                    pImp.append('role', ultraParams.title); // Title = Role
+                    pImp.append('year', ultraParams.year || '2024');
+                    pImp.append('stat', ultraParams.value); // Value = Stat
+                    pImp.append('desc', ultraParams.label); // Label = Stat Label
+                    pImp.append('description', ultraParams.content); // Content = Description
+                    pImp.append('tech', ultraParams.tech || '');
+                    pImp.append('logo', ultraParams.icon); // Icon = Logo
+                    pImp.append('theme', ultraParams.theme);
+
+                    if (ultraParams.theme === 'custom') {
+                        pImp.append('customColor', ultraParams.customColor || '#00f2ff');
+                        const c2 = ultraParams.customColor2 || '#ffffff';
+                        pImp.append('customColor2', c2);
+                    }
+
+                    url = `/api/templates/impact?${pImp.toString()}&t=${Date.now()}`;
+
+                } else if (ultraParams.component === 'quote' && ultraParams.quoteVariation === 'philosophy') {
+                    // Route to Philosophy API
+                    const pPhil = new URLSearchParams();
+                    pPhil.append('title', ultraParams.title);
+                    pPhil.append('quote', ultraParams.content); // Content = Quote
+                    pPhil.append('icon', ultraParams.icon);
+                    pPhil.append('footer', ultraParams.label); // Label = Footer
+                    pPhil.append('theme', ultraParams.theme);
+
+                    if (ultraParams.theme === 'custom') {
+                        pPhil.append('customColor', ultraParams.customColor || '#ffaa40');
+                        const c2 = ultraParams.customColor2 || '#ffffff';
+                        pPhil.append('customColor2', c2);
+                    }
+
+                    url = `/api/templates/philosophy?${pPhil.toString()}&t=${Date.now()}`;
+                } else {
+                    url = `/api/custom/ultra?${p.toString()}&t=${Date.now()}`;
+                }
 
             } else if (selectedTemplate === 'stack') {
                 const p = new URLSearchParams();
@@ -265,42 +275,6 @@ export function useTemplateGenerator() {
                 }
 
                 url = `/api/custom/social?${p.toString()}&t=${Date.now()}`;
-            } else if (selectedTemplate === 'philosophy') {
-                const p = new URLSearchParams();
-                p.append('title', philosophyParams.title);
-                p.append('quote', philosophyParams.quote);
-                p.append('icon', philosophyParams.icon);
-                p.append('lang', philosophyParams.lang);
-                p.append('theme', philosophyParams.theme);
-
-                if (philosophyParams.theme === 'custom') {
-                    p.append('customColor', philosophyParams.customColor || '#ffaa40');
-                    const c2 = philosophyParams.customColor2 || '#ffffff';
-                    p.append('customColor2', c2);
-                    p.append('secColor', c2);
-                }
-
-                url = `/api/templates/philosophy?${p.toString()}&t=${Date.now()}`;
-            } else if (selectedTemplate === 'impact') {
-                const p = new URLSearchParams();
-                p.append('company', impactParams.company);
-                p.append('role', impactParams.role);
-                p.append('year', impactParams.year);
-                p.append('stat', impactParams.stat);
-                p.append('desc', impactParams.statDesc);
-                p.append('description', impactParams.description);
-                p.append('tech', impactParams.tech);
-                p.append('logo', impactParams.logo);
-                p.append('theme', impactParams.theme);
-
-                if (impactParams.theme === 'custom') {
-                    p.append('customColor', impactParams.customColor || '#00f2ff');
-                    const c2 = impactParams.customColor2 || '#ffffff';
-                    p.append('customColor2', c2);
-                    p.append('secColor', c2);
-                }
-
-                url = `/api/templates/impact?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
@@ -309,7 +283,7 @@ export function useTemplateGenerator() {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams, impactParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams]);
 
     return {
         selectedTemplate,
@@ -322,7 +296,6 @@ export function useTemplateGenerator() {
         ultraParams, setUltraParams,
         stackParams, setStackParams,
         socialParams, setSocialParams,
-        philosophyParams, setPhilosophyParams,
-        impactParams, setImpactParams
+
     };
 }

@@ -51,8 +51,7 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSel
             */}
             <div
                 ref={scrollContainerRef}
-                className="flex gap-4 overflow-x-auto pt-12 pb-6 px-4 items-center scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent snap-x -mx-2"
-                style={{ scrollbarWidth: 'thin' }}
+                className="flex gap-4 overflow-x-auto pt-12 pb-6 px-4 items-center scrollbar-custom snap-x -mx-2"
             >
                 {THEME_PRESETS.map((theme: { id: string; label: string; colors: string[] }) => {
                     const isSelected = selectedTheme === theme.id;
@@ -66,10 +65,10 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSel
                             onMouseEnter={() => setHoveredLabel(theme.label)}
                             onMouseLeave={() => setHoveredLabel(null)}
                             className={`
-                                group relative w-10 h-10 rounded-full border-2 transition-all duration-300 shrink-0 snap-center outline-none
+                                group relative w-10 h-10 rounded-full transition-all duration-300 shrink-0 snap-center outline-none
                                 ${isSelected
-                                    ? 'border-cyan-400 scale-125 shadow-[0_0_15px_rgba(34,211,238,0.6)] z-10'
-                                    : 'border-white/10 hover:border-white/60 hover:scale-110 hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]'
+                                    ? 'ring-2 ring-cyan-400 scale-125 shadow-[0_0_15px_rgba(34,211,238,0.6)] z-10'
+                                    : 'ring-1 ring-inset ring-[rgba(255,255,255,0.2)] hover:ring-[rgba(255,255,255,0.6)] hover:scale-110 hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]'
                                 }
                             `}
                             style={{

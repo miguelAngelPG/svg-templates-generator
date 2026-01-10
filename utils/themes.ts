@@ -209,14 +209,20 @@ export function getTheme(themeName: string, customColor?: string, customColor2?:
     return baseTheme;
 }
 
+// Helper to extract dominant colors for the preview
+const getPreviewColors = (theme: ThemeColors): string[] => {
+    // We try to extract 3 colors: bg, accent, and a gradient/secondary part
+    // Regex to extract colors from gradient strings if needed, but for now simplistic:
+    return [theme.bg, theme.accent, theme.blob1 || theme.blob2 || theme.accent];
+};
+
 export const THEME_PRESETS = [
-    { id: 'dracula', label: 'Dracula', colors: ['#282a36', '#bd93f9', '#ff79c6'] }, // Matches
-    { id: 'nord', label: 'Nord', colors: ['#2e3440', '#88c0d0', '#81a1c1'] }, // Matches
-    { id: 'monokai', label: 'Monokai', colors: ['#272822', '#a6e22e', '#f92672'] }, // Matches
-    { id: 'sunset', label: 'Sunset', colors: ['#1f0a0a', '#ff4d4d', '#f9cb28'] }, // Synced with HERO_THEMES['sunset']
-    { id: 'cyberpunk', label: 'Cyberpunk', colors: ['#000000', '#fcee0a', '#00f0ff'] }, // Matches
-    { id: 'purple-cyan', label: 'Default', colors: ['#0f0a1e', '#00f2ff', '#bd00ff'] }, // Matches
-    { id: 'orange-pink', label: 'Fire', colors: ['#140505', '#ffaa40', '#f72585'] }, // Matches
-    { id: 'green-blue', label: 'Ocean', colors: ['#02120b', '#00ff9d', '#00b4d8'] }, // Matches
+    // Map all defined themes dynamically
+    ...Object.keys(HERO_THEMES).map(key => ({
+        id: key,
+        label: key.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        colors: getPreviewColors(HERO_THEMES[key])
+    })),
+    // Append Custom manually
     { id: 'custom', label: 'Custom', colors: ['#333', '#fff', '#888'] }
 ];

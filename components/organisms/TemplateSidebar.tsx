@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutTemplate, Settings } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
@@ -77,6 +77,31 @@ export function TemplateSidebar({
             }
         }
     }, [activeField]);
+
+    // Auto-scroll to custom inputs when theme becomes 'custom'
+    useEffect(() => {
+        const checkCustom = (theme: string) => {
+            if (theme === 'custom') {
+                // Small delay to allow render
+                setTimeout(() => {
+                    const element = document.getElementById('custom-theme-inputs');
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        // Optional: Focus the first color input
+                        const firstInput = element.querySelector('input[type="color"]') as HTMLInputElement;
+                        if (firstInput) firstInput.focus();
+                    }
+                }, 100);
+            }
+        };
+
+        checkCustom(retroParams.theme);
+        checkCustom(advancedParams.theme);
+        checkCustom(heroParams.theme);
+        checkCustom(ultraParams.theme);
+        checkCustom(stackParams.theme);
+        checkCustom(socialParams.theme);
+    }, [retroParams.theme, advancedParams.theme, heroParams.theme, ultraParams.theme, stackParams.theme, socialParams.theme]);
 
     // Helper removed (using ThemeGallery now)
 
@@ -217,7 +242,7 @@ export function TemplateSidebar({
                         </div>
 
                         {advancedParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div id="custom-theme-inputs" className="grid grid-cols-2 gap-2 mt-2">
                                 <div>
                                     <Label>Primary Acc.</Label>
                                     <div className="flex gap-2">
@@ -298,7 +323,7 @@ export function TemplateSidebar({
                         </div>
 
                         {heroParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div id="custom-theme-inputs" className="grid grid-cols-2 gap-2 mt-2">
                                 <div>
                                     <Label>Primary Acc.</Label>
                                     <div className="flex gap-2">
@@ -389,7 +414,7 @@ export function TemplateSidebar({
                         </div>
 
                         {ultraParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div id="custom-theme-inputs" className="grid grid-cols-2 gap-2 mt-2">
                                 <div>
                                     <Label>Primary Acc.</Label>
                                     <div className="flex gap-2">
@@ -663,7 +688,7 @@ export function TemplateSidebar({
 
                         {/* Custom Theme Colors */}
                         {stackParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div id="custom-theme-inputs" className="grid grid-cols-2 gap-2 mt-2">
                                 <div>
                                     <Label>Primary Acc.</Label>
                                     <div className="flex gap-2">
@@ -813,7 +838,7 @@ export function TemplateSidebar({
                         </div>
 
                         {socialParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div id="custom-theme-inputs" className="grid grid-cols-2 gap-2 mt-2">
                                 <div>
                                     <Label>Primary Acc.</Label>
                                     <div className="flex gap-2">

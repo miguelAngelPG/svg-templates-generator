@@ -114,11 +114,11 @@ export const HERO_THEMES: Record<string, ThemeColors> = {
     },
     'forest': {
         bg: '#051405',
-        bgGradient: 'linear-gradient(135deg, #051405 0%, #0a290a 100%)',
-        accent: '#52ff00',
-        gradient: 'linear-gradient(to right, #52ff00, #00ff80)',
-        blob1: '#006600',
-        blob2: '#52ff00'
+        bgGradient: 'linear-gradient(135deg, #051405 0%, #000 100%)',
+        accent: '#55ff55',
+        gradient: 'linear-gradient(to right, #55ff55, #00aa00)',
+        blob1: '#00aa00',
+        blob2: '#55ff55'
     },
     'lavender': {
         bg: '#11051c',
@@ -189,7 +189,7 @@ export function getTheme(themeName: string, customColor?: string, customColor2?:
     if (themeName === 'custom' && customColor) {
         // Validate customColor. If invalid, fallback to base theme accent or a safe default.
         const safePrimary = isValidColor(customColor) ? customColor : '#000000';
-        
+
         // If second color is provided, validate it. Otherwise, default to white.
         let safeSecondary = '#ffffff';
         if (customColor2 && isValidColor(customColor2)) {
@@ -208,3 +208,15 @@ export function getTheme(themeName: string, customColor?: string, customColor2?:
 
     return baseTheme;
 }
+
+export const THEME_PRESETS = [
+    { id: 'dracula', label: 'Dracula', colors: ['#282a36', '#bd93f9', '#ff79c6'] }, // Matches
+    { id: 'nord', label: 'Nord', colors: ['#2e3440', '#88c0d0', '#81a1c1'] }, // Matches
+    { id: 'monokai', label: 'Monokai', colors: ['#272822', '#a6e22e', '#f92672'] }, // Matches
+    { id: 'sunset', label: 'Sunset', colors: ['#1f0a0a', '#ff4d4d', '#f9cb28'] }, // Synced with HERO_THEMES['sunset']
+    { id: 'cyberpunk', label: 'Cyberpunk', colors: ['#000000', '#fcee0a', '#00f0ff'] }, // Matches
+    { id: 'purple-cyan', label: 'Default', colors: ['#0f0a1e', '#00f2ff', '#bd00ff'] }, // Matches
+    { id: 'orange-pink', label: 'Fire', colors: ['#140505', '#ffaa40', '#f72585'] }, // Matches
+    { id: 'green-blue', label: 'Ocean', colors: ['#02120b', '#00ff9d', '#00b4d8'] }, // Matches
+    { id: 'custom', label: 'Custom', colors: ['#333', '#fff', '#888'] }
+];

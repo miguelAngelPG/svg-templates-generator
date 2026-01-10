@@ -1,127 +1,96 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import satori from 'satori';
 import { getFonts } from '@/services/fonts';
 import { StackTemplate } from '@/components/templates/stack/StackTemplate';
+import { getTheme } from '@/utils/themes'; // Import standard theme getter
+import { fetchIcons } from '@/utils/social-icons'; // Import icon fetcher
+
+export const runtime = 'nodejs'; // Ensure Node.js runtime for now to avoid Edge quirks with large deps if any
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    // Parámetros
-    const items = searchParams.get('items') || 'Frontend,Backend,Architecture,DevOps';
-    const details = searchParams.get('details') || 'React|Next.js|Tailwind,.NET|Java|Node.js,Microservices|Clean Arch,Docker|CI/CD|Linux';
-    const icons = searchParams.get('icons') || '⚛️,⚙️,🏗️,🐳';
-    const themeName = searchParams.get('theme') || 'cyan';
+    // 1. Configurable Parameters & Defaults
+    // technologies: "react,typescript,nextdotjs,tailwindcss"
+    const techStr = searchParams.get('technologies') || searchParams.get('items') || 'react,typescript,nextdotjs';
+    const techSlugs = techStr.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 
-    const itemsArray = items.split(',');
-    const detailsArray = details.split(',');
-    const iconsArray = icons.split(',');
+    // layout params
+    const iconStyle = (searchParams.get('iconStyle') as any) || 'original'; // 'original' | 'monochrome' | 'glass'
+    const gap = parseInt(searchParams.get('gap') || '16', 10);
+    const bgTransparent = searchParams.get('bgTransparent') === 'true';
 
-    // Temas
-    const themes: Record<string, { primary: string; secondary: string; accent: string }> = {
-      cyan: { primary: '#00f2ff', secondary: '#4d47c3', accent: '#00ff9d' },
-      purple: { primary: '#bd00ff', secondary: '#7209b7', accent: '#f72585' },
-      orange: { primary: '#ffaa40', secondary: '#ff6b35', accent: '#ffd60a' },
-      green: { primary: '#00ff9d', secondary: '#06ffa5', accent: '#4d47c3' }
-    };
+    // theme params
+    const themeName = searchParams.get('theme') || 'purple-cyan';
+    const customColor = searchParams.get('customColor') || undefined;
+    const customColor2 = searchParams.get('customColor2') || undefined;
 
-    const currentTheme = themes[themeName] || themes.cyan;
+    // 2. Resolve Theme & Icons
+    const currentTheme = getTheme(themeName, customColor, customColor2);
+
+    // Fetch icons (parallel, server-side)
+    // If iconStyle is monochrome/glass, we might want to fetch colored icons and manipulate them, 
+    // or fetch white icons. simple-icons supports /color/white.
+    // For 'glass', white icons are best. for 'monochrome', maybe accent color?
+    // Let's pass undefined color to get original colors by default, unless style demands it.
+    let iconColor: string | undefined = undefined;
+    if (iconStyle === 'glass' || iconStyle === 'monochrome') {
+      iconColor = 'white'; // Satori applies colors better via props or mask, but simple-icons url with color is robust
+    }
+
+    const fetchedIcons = await fetchIcons(techSlugs, iconColor);
+
+    // 3. Prepare Fonts
     const fonts = await getFonts();
 
-    // 1. Generate Static Layout with Satori
+    // 4. Calculate Dimensions (Dynamic based on content)
+    // Horizontal Stack: Padding * 2 + (IconSize * count) + (Gap * (count - 1))
+    // IconSize = 40 (from Component)
+    const iconSize = 40;
+    const padding = 20;
+    const count = fetchedIcons.length || 1;
+    const contentWidth = (padding * 2) + (iconSize * count) + (gap * (count - 1));
+    const width = Math.max(contentWidth, 300); // Minimum width
+    const height = 80; // Fixed height for singular row
+
+    // 5. Generate SVG
     const svg = await satori(
       <StackTemplate
-        itemsArray={itemsArray}
-        detailsArray={detailsArray}
-        iconsArray={iconsArray}
+        icons={fetchedIcons}
         theme={currentTheme}
+        iconStyle={iconStyle}
+        gap={gap}
+        bgTransparent={bgTransparent}
       />,
       {
-        width: 800,
-        height: 220,
+        width,
+        height,
         fonts: [
           { name: 'Outfit', data: fonts.outfitRegular, weight: 400, style: 'normal' },
-          { name: 'Outfit', data: fonts.outfitBold, weight: 700, style: 'normal' },
-          { name: 'Outfit', data: fonts.outfitBold, weight: 600, style: 'normal' },
         ],
       }
     );
 
-    // 2. Inject Animations & Filters
-    const injectedStyles = `
-  <defs>
-    <filter id="glass" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur"/>
-      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.06 0" result="glass"/>
-      <feBlend in="SourceGraphic" in2="glass" mode="normal"/>
-    </filter>
-
-    <filter id="itemShadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
-      <feOffset dx="0" dy="3" result="offsetblur"/>
-      <feFlood flood-color="${currentTheme.primary}" flood-opacity="0.2" result="color"/>
-      <feComposite in="color" in2="offsetblur" operator="in" result="shadow"/>
-      <feMerge>
-        <feMergeNode in="shadow"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-
-    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:${currentTheme.primary};stop-opacity:1" />
-      <stop offset="100%" style="stop-color:${currentTheme.secondary};stop-opacity:0.6" />
-    </linearGradient>
-
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&amp;display=swap');
-      
-      @keyframes iconRotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      @keyframes glowPulse {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 0.8; }
-      }
-
-      @keyframes itemFadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      
-      /* Target icons? Without classes, it's hard. 
-         We might rely on the fact that Satori output is stable.
-         Or we can accept that icons won't rotate unless we use a robust specific selector or inline style injection.
-         However, inline styles on React elements (style={{ animation: ... }}) are stripped by Satori usually.
-         For now, we keep the definitions. If the user REALLY needs the specific animations on specific elements, 
-         we might need to post-process the SVG string to add classNames or IDs.
-         Legacy 'Impact' template relied on explicit <animate> tags which Satori doesn't output.
-      */
-    </style>
-  </defs>
-        `;
-
-    // Inject just before closing svg
-    const finalSvg = svg.replace('</svg>', `${injectedStyles}</svg>`);
-
-    return new Response(finalSvg, {
+    // 6. Return Response
+    return new NextResponse(svg, {
       headers: {
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': 'public, max-age=86400, mutable', // Cache for 1 day
+        'Access-Control-Allow-Origin': '*',
       },
     });
 
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(`<svg><text>Error generating template</text></svg>`, { headers: { 'Content-Type': 'image/svg+xml' } });
+    console.error('Stack Template Generaton Error:', error);
+    return new NextResponse(
+      `<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#111"/>
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="red" font-family="monospace">
+                Error generating stack
+            </text>
+        </svg>`,
+      { status: 500, headers: { 'Content-Type': 'image/svg+xml' } }
+    );
   }
 }

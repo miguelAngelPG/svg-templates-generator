@@ -7,6 +7,7 @@ import { Select } from '../atoms/Select';
 import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
 import { TemplateSelector } from '../molecules/TemplateSelector';
+import { ThemeGallery } from '../molecules/ThemeGallery';
 import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
 
@@ -77,17 +78,7 @@ export function TemplateSidebar({
         }
     }, [activeField]);
 
-    // Helper to render theme options dynamically
-    const renderThemeOptions = () => (
-        <>
-            {Object.keys(HERO_THEMES).map(key => (
-                <option key={key} value={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1).replace('-', ' ')}
-                </option>
-            ))}
-            <option value="custom">Custom Color</option>
-        </>
-    );
+    // Helper removed (using ThemeGallery now)
 
     return (
         <div className="flex flex-col gap-6 h-full">
@@ -160,15 +151,10 @@ export function TemplateSidebar({
                         </div>
 
                         <div className="mt-4 border-t border-gray-800 pt-4" data-field="theme">
-                            <Label>Theme</Label>
-                            <Select
-                                value={retroParams.theme}
-                                onChange={(e) => setRetroParams({ ...retroParams, theme: e.target.value })}
-                                fullWidth
-                                className="mt-1"
-                            >
-                                {renderThemeOptions()}
-                            </Select>
+                            <ThemeGallery
+                                selectedTheme={retroParams.theme}
+                                onSelect={(t) => setRetroParams({ ...retroParams, theme: t })}
+                            />
                         </div>
 
                         {retroParams.theme === 'custom' && (
@@ -224,10 +210,10 @@ export function TemplateSidebar({
                         </div>
 
                         <div className="mt-2">
-                            <Label>Theme</Label>
-                            <Select value={advancedParams.theme} onChange={e => setAdvancedParams({ ...advancedParams, theme: e.target.value })} fullWidth>
-                                {renderThemeOptions()}
-                            </Select>
+                            <ThemeGallery
+                                selectedTheme={advancedParams.theme}
+                                onSelect={(t) => setAdvancedParams({ ...advancedParams, theme: t })}
+                            />
                         </div>
 
                         {advancedParams.theme === 'custom' && (
@@ -294,22 +280,21 @@ export function TemplateSidebar({
                         </div>
 
 
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <Label>Style</Label>
-                                <Select value={heroParams.style} onChange={e => setHeroParams({ ...heroParams, style: e.target.value as any })} fullWidth>
-                                    <option value="modern">Modern (Glass)</option>
-                                    <option value="minimal">Minimal (B&W)</option>
-                                    <option value="cyber">Cyber (Tech)</option>
-                                    <option value="terminal">Terminal (Dev)</option>
-                                </Select>
-                            </div>
-                            <div>
-                                <Label>Theme</Label>
-                                <Select value={heroParams.theme} onChange={e => setHeroParams({ ...heroParams, theme: e.target.value })} fullWidth>
-                                    {renderThemeOptions()}
-                                </Select>
-                            </div>
+                        <div className="mb-4">
+                            <Label>Style</Label>
+                            <Select value={heroParams.style} onChange={e => setHeroParams({ ...heroParams, style: e.target.value as any })} fullWidth>
+                                <option value="modern">Modern (Glass)</option>
+                                <option value="minimal">Minimal (B&W)</option>
+                                <option value="cyber">Cyber (Tech)</option>
+                                <option value="terminal">Terminal (Dev)</option>
+                            </Select>
+                        </div>
+
+                        <div className="mb-4">
+                            <ThemeGallery
+                                selectedTheme={heroParams.theme}
+                                onSelect={(t) => setHeroParams({ ...heroParams, theme: t })}
+                            />
                         </div>
 
                         {heroParams.theme === 'custom' && (
@@ -400,12 +385,7 @@ export function TemplateSidebar({
                                 </div>
                             )}
 
-                            <div>
-                                <Label>Theme</Label>
-                                <Select value={ultraParams.theme} onChange={e => setUltraParams({ ...ultraParams, theme: e.target.value })} fullWidth>
-                                    {renderThemeOptions()}
-                                </Select>
-                            </div>
+                            {/* Theme Removed from here, moved to bottom */}
                         </div>
 
                         {ultraParams.theme === 'custom' && (
@@ -472,7 +452,6 @@ export function TemplateSidebar({
                                         />
                                     </div>
                                 </div>
-                                {/* Footer / Label for Quote */}
                                 <div className="mb-2">
                                     <ConfigField
                                         label={ultraParams.quoteVariation === 'philosophy' ? 'Footer (e.g. Personal Philosophy)' : 'Footer / Caption'}
@@ -577,6 +556,16 @@ export function TemplateSidebar({
                     </div>
                 )}
 
+                {/* Theme Gallery for Ultra - Moved to Bottom (Global for Ultra) */}
+                {selectedTemplate === 'ultra' && (
+                    <div className="mt-4 border-t border-gray-800 pt-4">
+                        <ThemeGallery
+                            selectedTheme={ultraParams.theme}
+                            onSelect={(t) => setUltraParams({ ...ultraParams, theme: t })}
+                        />
+                    </div>
+                )}
+
                 {/* Stack Configuration */}
                 {selectedTemplate === 'stack' && (
                     <>
@@ -626,11 +615,10 @@ export function TemplateSidebar({
                         </div>
 
                         <div className="mt-2">
-                            <Label>Theme (For Background/Glass)</Label>
-                            <Select value={stackParams.theme} onChange={e => setStackParams({ ...stackParams, theme: e.target.value })} fullWidth>
-                                {renderThemeOptions()}
-                            </Select>
-
+                            <ThemeGallery
+                                selectedTheme={stackParams.theme}
+                                onSelect={(t) => setStackParams({ ...stackParams, theme: t })}
+                            />
                             <div className="flex items-center justify-between mt-3 p-2 bg-[#1a1a1a] rounded border border-gray-800">
                                 <span className="text-xs text-gray-300 font-medium">Fondo Transparente</span>
                                 <button
@@ -818,10 +806,10 @@ export function TemplateSidebar({
                         </div>
 
                         <div className="mt-2">
-                            <Label>Theme</Label>
-                            <Select value={socialParams.theme} onChange={e => setSocialParams({ ...socialParams, theme: e.target.value })} fullWidth>
-                                {renderThemeOptions()}
-                            </Select>
+                            <ThemeGallery
+                                selectedTheme={socialParams.theme}
+                                onSelect={(t) => setSocialParams({ ...socialParams, theme: t })}
+                            />
                         </div>
 
                         {socialParams.theme === 'custom' && (
@@ -915,15 +903,10 @@ export function TemplateSidebar({
                         </div>
 
                         <div className="mt-4 border-t border-gray-800 pt-4">
-                            <Label>Theme</Label>
-                            <Select
-                                value={retroParams.theme}
-                                onChange={(e) => setRetroParams({ ...retroParams, theme: e.target.value })}
-                                fullWidth
-                                className="mt-1"
-                            >
-                                {renderThemeOptions()}
-                            </Select>
+                            <ThemeGallery
+                                selectedTheme={retroParams.theme}
+                                onSelect={(t) => setRetroParams({ ...retroParams, theme: t })}
+                            />
                         </div>
 
                         {retroParams.theme === 'custom' && (

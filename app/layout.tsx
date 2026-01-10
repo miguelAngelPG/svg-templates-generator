@@ -34,7 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-screen flex flex-col overflow-hidden bg-[#050505] text-white`}
       >
         <Navbar />
-        <main className="flex-1 overflow-hidden relative scroll-smooth">
+        <main className="flex-1 overflow-y-auto relative scroll-smooth">
           {children}
         </main>
       </body>

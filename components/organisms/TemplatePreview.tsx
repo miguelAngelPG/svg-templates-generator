@@ -113,34 +113,42 @@ export function TemplatePreview({
             if (ultraParams.component === 'stat') component = <UltraStat {...ultraParams} theme={ultraTheme} />;
             else if (ultraParams.component === 'quote') {
                 if (ultraParams.quoteVariation === 'philosophy') {
-                    // Map UltraParams to PhilosophyTemplateProps
-                    const philTheme = {
-                        bg: theme.bg,
-                        bgGradient: theme.bgGradient,
-                        primary: theme.accent,
-                        secondary: theme.blob1 || theme.accent,
+                    // Philosophy uses specific dimensions
+                    width = 800;
+                    height = 250; // Increased height for better fit (was potentially clipping)
+                    const philosophyTheme = {
+                        bg: ultraTheme.bg,
+                        bgGradient: theme.bgGradient, // Fix: Use 'theme' source directly
+                        primary: ultraTheme.accent, // Map Ultra accent to Philosophy primary
+                        secondary: ultraTheme.blob1
                     };
 
                     component = (
                         <PhilosophyTemplate
-                            title={ultraParams.title}
-                            quote={ultraParams.content}
-                            icon={ultraParams.icon}
+                            title={ultraParams.title || 'Stoicism'}
+                            quote={ultraParams.content || 'The obstacle is the way.'}
+                            icon={ultraParams.icon || '🏛️'}
                             footer={ultraParams.label}
-                            theme={philTheme}
+                            theme={philosophyTheme}
                         />
                     );
                 } else {
+                    // Standard Ultra Quote is 600x300
+                    width = 600;
+                    height = 300;
                     component = <UltraQuote {...ultraParams} theme={ultraTheme} />;
                 }
             }
             else if (ultraParams.component === 'card') {
                 if (ultraParams.cardVariation === 'impact') {
-                    // Map UltraParams to ImpactTemplateProps
+                    // Impact uses vertical dimensions
+                    width = 380;
+                    height = 420;
+
                     const impactTheme = {
-                        primary: theme.accent,
-                        secondary: theme.blob1 || theme.accent,
-                        accent: theme.blob2 || '#ffffff'
+                        primary: ultraTheme.accent,
+                        secondary: ultraTheme.blob1,
+                        accent: ultraTheme.blob2
                     };
 
                     component = (
@@ -157,14 +165,22 @@ export function TemplatePreview({
                         />
                     );
                 } else {
+                    // Standard Ultra Card is determined by UltraCard.tsx (600x300)
+                    width = 600;
+                    height = 300;
                     component = <UltraCard {...ultraParams} theme={ultraTheme} />;
                 }
             }
-            else if (ultraParams.component === 'badge') component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
+            else if (ultraParams.component === 'badge') {
+                // UltraBadge is 600x300
+                width = 600;
+                height = 300;
+                component = <UltraBadge {...ultraParams} theme={ultraTheme} />;
+            }
         }
         else if (templateName === 'stack') {
             width = 800; // flexible container
-            height = 100;
+            height = 200; // Increased height to prevent cutoff
             const theme = getTheme(stackParams.theme, stackParams.customColor, stackParams.customColor2);
 
             component = (

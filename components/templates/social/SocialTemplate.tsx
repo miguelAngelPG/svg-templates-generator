@@ -1,11 +1,11 @@
 import React from 'react';
 import { SocialPlatform } from '@/utils/social-icons';
-import { ThemeResult } from '@/utils/themes';
+import { ThemeColors } from '@/utils/themes';
 
 export interface SocialTemplateProps {
     platforms: SocialPlatform[];
     style: 'badge' | 'card' | 'block' | 'minimal' | 'glass-grid' | 'icon-only';
-    theme: ThemeResult;
+    theme: ThemeColors;
 }
 
 export const SocialTemplate: React.FC<SocialTemplateProps> = ({ platforms, style, theme: t }) => {

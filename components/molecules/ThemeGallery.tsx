@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { THEME_PRESETS } from '@/utils/themes';
 import { Label } from '../atoms/Label';
 
@@ -10,6 +10,7 @@ interface ThemeGalleryProps {
 export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSelect }) => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const selectedRef = useRef<HTMLButtonElement>(null);
+    const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
 
     // Auto-scroll to selected theme on mount/change
     useEffect(() => {
@@ -29,21 +30,28 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSel
         }
     }, [selectedTheme]);
 
+    // Find current label
+    const currentThemeLabel = THEME_PRESETS.find(t => t.id === selectedTheme)?.label || 'Custom';
+
     return (
         <div className="mb-4">
-            <div className="flex justify-between items-baseline mb-2">
+            <div className="flex justify-between items-baseline mb-1">
                 <Label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
                     Theme Gallery
                 </Label>
                 <span className="text-[10px] text-gray-600">
-                    {THEME_PRESETS.length} presets
+                    {currentThemeLabel}
                 </span>
             </div>
 
-            {/* Horizontal Scrollable Container */}
+            {/* Horizontal Scrollable Container 
+                Increased vertical padding to accommodate tooltips and scaling without clipping.
+                pt-12 gives room for the top tooltip.
+                pb-6 gives room for the bottom shadow and potential scaling.
+            */}
             <div
                 ref={scrollContainerRef}
-                className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent snap-x"
+                className="flex gap-4 overflow-x-auto pt-12 pb-6 px-4 items-center scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent snap-x -mx-2"
                 style={{ scrollbarWidth: 'thin' }}
             >
                 {THEME_PRESETS.map((theme: { id: string; label: string; colors: string[] }) => {
@@ -55,11 +63,13 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSel
                             key={theme.id}
                             ref={isSelected ? selectedRef : null}
                             onClick={() => onSelect(theme.id)}
+                            onMouseEnter={() => setHoveredLabel(theme.label)}
+                            onMouseLeave={() => setHoveredLabel(null)}
                             className={`
-                                group relative w-10 h-10 rounded-full border-2 transition-all duration-200 shrink-0 snap-center
+                                group relative w-10 h-10 rounded-full border-2 transition-all duration-300 shrink-0 snap-center outline-none
                                 ${isSelected
-                                    ? 'border-cyan-400 scale-110 shadow-[0_0_8px_rgba(34,211,238,0.5)] z-10'
-                                    : 'border-transparent hover:border-white/30 hover:scale-105'
+                                    ? 'border-cyan-400 scale-125 shadow-[0_0_15px_rgba(34,211,238,0.6)] z-10'
+                                    : 'border-white/10 hover:border-white/60 hover:scale-110 hover:shadow-[0_0_10px_rgba(255,255,255,0.2)]'
                                 }
                             `}
                             style={{
@@ -67,7 +77,6 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSel
                                     ? `conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)`
                                     : `linear-gradient(135deg, ${theme.colors[0]} 0%, ${theme.colors[1]} 100%)`
                             }}
-                            title={theme.label}
                         >
                             {/* Inner Accent Dot / Icon */}
                             {!isCustom && theme.colors[2] && (
@@ -83,11 +92,11 @@ export const ThemeGallery: React.FC<ThemeGalleryProps> = ({ selectedTheme, onSel
                                 </div>
                             )}
 
-                            {/* Tooltip on Hover - Improved positioning */}
-                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 border border-gray-700 shadow-xl hidden sm:block">
+                            {/* Floating Tooltip - Now contained in the padding area */}
+                            <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 border border-gray-700 rounded text-[10px] text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-xl z-20">
                                 {theme.label}
                                 {/* Arrow */}
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-700"></div>
                             </div>
                         </button>
                     );

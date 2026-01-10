@@ -183,7 +183,7 @@ export function TemplateSidebar({
                         </div>
 
                         {retroParams.theme === 'custom' && (
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div id="custom-theme-inputs" className="grid grid-cols-2 gap-2 mt-2">
                                 <div>
                                     <Label>Primary Color</Label>
                                     <div className="flex items-center gap-2 mt-1">

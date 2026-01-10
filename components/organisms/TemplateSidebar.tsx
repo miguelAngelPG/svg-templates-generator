@@ -166,6 +166,7 @@ export function TemplateSidebar({
                                     <option value="modern">Modern (Glass)</option>
                                     <option value="minimal">Minimal (B&W)</option>
                                     <option value="cyber">Cyber (Tech)</option>
+                                    <option value="terminal">Terminal (Dev)</option>
                                 </Select>
                             </div>
                             <div>

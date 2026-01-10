@@ -6,6 +6,7 @@ import { getTheme } from '@/utils/themes';
 import { ModernTemplate } from '@/components/templates/hero/ModernTemplate';
 import { MinimalTemplate } from '@/components/templates/hero/MinimalTemplate';
 import { CyberTemplate } from '@/components/templates/hero/CyberTemplate';
+import { TerminalTemplate } from '@/components/templates/hero/TerminalTemplate';
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,6 +35,9 @@ export async function GET(request: NextRequest) {
         break;
       case 'cyber':
         jsx = <CyberTemplate name={name} title={title} subtitle={subtitle} location={location} theme={theme} />;
+        break;
+      case 'terminal':
+        jsx = <TerminalTemplate name={name} title={title} subtitle={subtitle} location={location} theme={theme} />;
         break;
       case 'modern':
       default:

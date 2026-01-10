@@ -9,6 +9,7 @@ import { AdvancedCard } from '../templates/advanced/AdvancedCard';
 import { ModernTemplate } from '../templates/hero/ModernTemplate';
 import { MinimalTemplate } from '../templates/hero/MinimalTemplate';
 import { CyberTemplate } from '../templates/hero/CyberTemplate';
+import { TerminalTemplate } from '../templates/hero/TerminalTemplate';
 import { UltraStat } from '../templates/ultra/UltraStat';
 import { UltraQuote } from '../templates/ultra/UltraQuote';
 import { ActionButtons } from '../molecules/ActionButtons';
@@ -92,6 +93,7 @@ export function TemplatePreview({
             if (heroParams.style === 'modern') component = <ModernTemplate {...heroParams} theme={theme} />;
             else if (heroParams.style === 'minimal') component = <MinimalTemplate {...heroParams} theme={theme} />;
             else if (heroParams.style === 'cyber') component = <CyberTemplate {...heroParams} theme={theme} />;
+            else if (heroParams.style === 'terminal') component = <TerminalTemplate {...heroParams} theme={theme} />;
         }
         else if (templateName === 'ultra') {
             width = 600;

@@ -4,7 +4,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
 import { IconPicker } from '../molecules/IconPicker';
 import { HERO_THEMES } from '@/utils/themes';
@@ -27,6 +27,9 @@ interface TemplateSidebarProps {
 
     socialParams: SocialParams;
     setSocialParams: (val: SocialParams) => void;
+
+    philosophyParams: PhilosophyParams;
+    setPhilosophyParams: (val: PhilosophyParams) => void;
 }
 
 export function TemplateSidebar({
@@ -35,7 +38,8 @@ export function TemplateSidebar({
     heroParams, setHeroParams,
     ultraParams, setUltraParams,
     stackParams, setStackParams,
-    socialParams, setSocialParams
+    socialParams, setSocialParams,
+    philosophyParams, setPhilosophyParams
 }: TemplateSidebarProps) {
 
     // Helper to render theme options dynamically
@@ -73,6 +77,7 @@ export function TemplateSidebar({
                     <option value="ultra">Ultra Components (Stats)</option>
                     <option value="stack">Tech Stack (By Readme Forge)</option>
                     <option value="social">Social Hub (Connect)</option>
+                    <option value="philosophy">Philosophy (Personal)</option>
                 </Select>
             </div>
 
@@ -612,6 +617,85 @@ export function TemplateSidebar({
                                             type="text"
                                             value={socialParams.customColor2 || '#ffffff'}
                                             onChange={e => setSocialParams({ ...socialParams, customColor2: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Philosophy Configuration */}
+                {selectedTemplate === 'philosophy' && (
+                    <>
+                        <ConfigField label="Section Title" value={philosophyParams.title} onChange={v => setPhilosophyParams({ ...philosophyParams, title: v })} maxLength={40} />
+
+                        <div>
+                            <Label>Personal Quote</Label>
+                            <textarea
+                                value={philosophyParams.quote}
+                                onChange={(e) => setPhilosophyParams({ ...philosophyParams, quote: e.target.value })}
+                                maxLength={100}
+                                className="bg-[#222] rounded px-3 py-2 text-sm border border-gray-700 focus:border-purple-500 focus:outline-none text-white w-full h-20 resize-none mt-1"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <ConfigField label="Icon/Emoji" value={philosophyParams.icon} onChange={v => setPhilosophyParams({ ...philosophyParams, icon: v })} maxLength={2} />
+
+                            <div>
+                                <Label>Lang</Label>
+                                <Select value={philosophyParams.lang} onChange={e => setPhilosophyParams({ ...philosophyParams, lang: e.target.value as any })} fullWidth>
+                                    <option value="en">English</option>
+                                    <option value="es">Español</option>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="mt-2">
+                            <Label>Theme</Label>
+                            <Select value={philosophyParams.theme} onChange={e => setPhilosophyParams({ ...philosophyParams, theme: e.target.value })} fullWidth>
+                                {renderThemeOptions()}
+                            </Select>
+                        </div>
+
+                        {philosophyParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={philosophyParams.customColor || '#ffaa40'}
+                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={philosophyParams.customColor || '#ffaa40'}
+                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor: e.target.value })}
+                                            fullWidth
+                                            maxLength={7}
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Acc.</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="color"
+                                            value={philosophyParams.customColor2 || '#ffffff'}
+                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor2: e.target.value })}
+                                            className="w-8 h-8 p-1 cursor-pointer shrink-0"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={philosophyParams.customColor2 || '#ffffff'}
+                                            onChange={e => setPhilosophyParams({ ...philosophyParams, customColor2: e.target.value })}
                                             fullWidth
                                             maxLength={7}
                                             className="text-xs"

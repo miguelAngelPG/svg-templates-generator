@@ -183,17 +183,26 @@ export const HERO_THEMES: Record<string, ThemeColors> = {
 export function getTheme(themeName: string, customColor?: string, customColor2?: string): ThemeColors {
     const baseTheme = HERO_THEMES[themeName] || HERO_THEMES['purple-cyan'];
 
+    // Security: Validate hex colors to prevent CSS injection
+    const isValidColor = (color: string) => /^#([0-9A-F]{3}){1,2}$/i.test(color);
+
     if (themeName === 'custom' && customColor) {
-        // If second color is provided, use it. Otherwise, create a variation or default.
-        const secondary = customColor2 || '#ffffff';
+        // Validate customColor. If invalid, fallback to base theme accent or a safe default.
+        const safePrimary = isValidColor(customColor) ? customColor : '#000000';
+        
+        // If second color is provided, validate it. Otherwise, default to white.
+        let safeSecondary = '#ffffff';
+        if (customColor2 && isValidColor(customColor2)) {
+            safeSecondary = customColor2;
+        }
 
         return {
             bg: '#0a0a0a',
-            bgGradient: `linear-gradient(135deg, ${customColor}40 0%, ${secondary}40 100%)`, // Gradient between both custom colors
-            accent: customColor,
-            gradient: `linear-gradient(135deg, ${customColor} 0%, ${secondary} 100%)`,
-            blob1: customColor,
-            blob2: secondary
+            bgGradient: `linear-gradient(135deg, ${safePrimary}40 0%, ${safeSecondary}40 100%)`, // Gradient between both custom colors
+            accent: safePrimary,
+            gradient: `linear-gradient(135deg, ${safePrimary} 0%, ${safeSecondary} 100%)`,
+            blob1: safePrimary,
+            blob2: safeSecondary
         };
     }
 

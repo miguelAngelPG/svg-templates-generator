@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'philosophy';
 
 export interface AdvancedParams {
     content: string;
@@ -56,6 +56,16 @@ export interface SocialParams {
     customColor2: string;
 }
 
+export interface PhilosophyParams {
+    title: string;
+    quote: string;
+    icon: string;
+    lang: 'en' | 'es';
+    theme: string;
+    customColor: string;
+    customColor2: string;
+}
+
 export function useTemplateGenerator() {
     const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('advanced');
     const [generatedUrl, setGeneratedUrl] = useState('');
@@ -68,7 +78,7 @@ export function useTemplateGenerator() {
         subtitle: 'Q1 2026 Roadmap',
         width: 800,
         height: 400,
-        theme: 'purple-cyan',
+        theme: 'custom', // Default to custom to show color picker potentially or just 'purple-cyan'
         customColor: '#8855ff',
         customColor2: '#ffffff',
         layout: 'center'
@@ -117,6 +127,16 @@ export function useTemplateGenerator() {
         style: 'badge',
         theme: 'purple-cyan',
         customColor: '#8855ff',
+        customColor2: '#ffffff'
+    });
+
+    const [philosophyParams, setPhilosophyParams] = useState<PhilosophyParams>({
+        title: 'The Person Behind the Code',
+        quote: 'Technology is the tool, empathy is the engine.',
+        icon: '⚛',
+        lang: 'en',
+        theme: 'orange-pink',
+        customColor: '#ffaa40',
         customColor2: '#ffffff'
     });
 
@@ -202,10 +222,6 @@ export function useTemplateGenerator() {
                 url = `/api/custom/stack?${p.toString()}&t=${Date.now()}`;
             } else if (selectedTemplate === 'social') {
                 const p = new URLSearchParams();
-                // Serialize platforms as provider:username,provider:username
-                // Serialize platforms as provider:username
-                // ALLOW platform with empty username for preview purposes! 
-                // The API should handle empty usernames gracefully (showing just provider name)
                 const validPlatforms = socialParams.platforms.filter(p => p.provider.trim() !== '');
                 const platformString = validPlatforms.map(pt => `${pt.provider}:${pt.username}`).join(',');
 
@@ -221,15 +237,31 @@ export function useTemplateGenerator() {
                 }
 
                 url = `/api/custom/social?${p.toString()}&t=${Date.now()}`;
+            } else if (selectedTemplate === 'philosophy') {
+                const p = new URLSearchParams();
+                p.append('title', philosophyParams.title);
+                p.append('quote', philosophyParams.quote);
+                p.append('icon', philosophyParams.icon);
+                p.append('lang', philosophyParams.lang);
+                p.append('theme', philosophyParams.theme);
+
+                if (philosophyParams.theme === 'custom') {
+                    p.append('customColor', philosophyParams.customColor || '#ffaa40');
+                    const c2 = philosophyParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                    p.append('secColor', c2);
+                }
+
+                url = `/api/templates/philosophy?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
-            // Artificial delay to show loading state implies "processing" even if instant
+            // Artificial delay
             setTimeout(() => setIsLoading(false), 300);
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams]);
 
     return {
         selectedTemplate,
@@ -241,6 +273,7 @@ export function useTemplateGenerator() {
         heroParams, setHeroParams,
         ultraParams, setUltraParams,
         stackParams, setStackParams,
-        socialParams, setSocialParams
+        socialParams, setSocialParams,
+        philosophyParams, setPhilosophyParams
     };
 }

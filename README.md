@@ -79,6 +79,8 @@ Banner de filosofía/quote personal con warmth effect.
 - `quote` - Tu quote personal (default: "Technology is the tool, empathy is the engine.")
 - `icon` - Emoji/ícono (default: "⚛")
 - `lang` - Idioma: `es` | `en` (default: "en")
+- `theme` - Tema: `cyan` | `purple` | `orange-pink` | etc. (default: "orange-pink")
+- `customColor` - Color Hex personalizado (opcional)
 
 **Efectos incluidos:**
 - 🔥 Warm gradient overlay

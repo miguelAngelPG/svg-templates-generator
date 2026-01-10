@@ -14,9 +14,10 @@ import { UltraQuote } from '../templates/ultra/UltraQuote';
 import { UltraCard } from '../templates/ultra/UltraCard';
 import { UltraBadge } from '../templates/ultra/UltraBadge';
 import { TechStackRow } from '../templates/stack/TechStackRow';
+import { PhilosophyTemplate } from '../templates/philosophy/PhilosophyTemplate';
 
 import { getTheme } from '@/utils/themes';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, PhilosophyParams } from '@/hooks/useTemplateGenerator';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -29,6 +30,7 @@ interface TemplatePreviewProps {
     ultraParams: UltraParams;
     stackParams: StackParams;
     socialParams: SocialParams;
+    philosophyParams: PhilosophyParams;
 }
 
 export function TemplatePreview({
@@ -39,7 +41,8 @@ export function TemplatePreview({
     heroParams,
     ultraParams,
     stackParams,
-    socialParams
+    socialParams,
+    philosophyParams
 }: TemplatePreviewProps) {
 
     const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${generatedUrl}` : generatedUrl;
@@ -130,10 +133,33 @@ export function TemplatePreview({
                 </div>
             );
         }
+        else if (templateName === 'philosophy') {
+            width = 800;
+            height = 250;
+            const theme = getTheme(philosophyParams.theme, philosophyParams.customColor, philosophyParams.customColor2);
+
+            // Map theme to Philosophy format
+            const philosophyTheme = {
+                bg: theme.bg,
+                bgGradient: theme.bgGradient || theme.bg,
+                primary: theme.accent,
+                secondary: theme.blob1 || '#ffffff'
+            };
+
+            component = (
+                <PhilosophyTemplate
+                    title={philosophyParams.title}
+                    quote={philosophyParams.quote}
+                    icon={philosophyParams.icon}
+                    lang={philosophyParams.lang}
+                    theme={philosophyTheme}
+                />
+            );
+        }
 
         return { component, width, height };
 
-    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, generatedUrl, isLoading]);
+    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, philosophyParams, generatedUrl, isLoading]);
 
     return (
         <div className="flex flex-col gap-6 h-full">

@@ -1,7 +1,9 @@
 import { NextRequest } from 'next/server';
 import satori from 'satori';
 
-import { getFonts } from '@/services/fonts';
+import { getInterFonts } from '@/services/fonts';
+
+export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
   try {
@@ -72,7 +74,7 @@ export async function GET(request: NextRequest) {
       </div>
     );
 
-    const fonts = await getFonts();
+    const fonts = await getInterFonts();
 
     // Convertir JSX a SVG usando Satori
     const svg = await satori(jsx, {
@@ -81,7 +83,7 @@ export async function GET(request: NextRequest) {
       fonts: [
         {
           name: 'Inter',
-          data: fonts.interRegular,
+          data: fonts.regular,
           weight: 400,
           style: 'normal',
         },

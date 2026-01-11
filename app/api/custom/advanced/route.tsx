@@ -2,7 +2,9 @@ import { NextRequest } from 'next/server';
 import satori from 'satori';
 import React from 'react';
 import { getTheme } from '@/utils/themes';
-import { getFonts } from '@/services/fonts';
+import { getInterFonts } from '@/services/fonts';
+
+export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
     try {
@@ -183,8 +185,8 @@ export async function GET(request: NextRequest) {
             </div>
         );
 
-        const fonts = await getFonts();
-        console.log('Fetching fonts... (cached)');
+        const fonts = await getInterFonts();
+        console.log('Fetching fonts... (cached/optimized)');
 
         // Convertir a SVG
         const svg = await satori(jsx, {
@@ -193,19 +195,19 @@ export async function GET(request: NextRequest) {
             fonts: [
                 {
                     name: 'Inter',
-                    data: fonts.interRegular,
+                    data: fonts.regular,
                     weight: 400,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: fonts.interSemiBold,
+                    data: fonts.semiBold,
                     weight: 600,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: fonts.interSemiBold, // Reuse 600 for 700 request
+                    data: fonts.bold, // Using bold (900 from fetch)
                     weight: 700,
                     style: 'normal',
                 },

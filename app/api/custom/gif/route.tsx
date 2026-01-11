@@ -130,7 +130,7 @@ async function generateGif(params: { html: string, css: string, width: number, h
     return new Response(gifBuffer, {
       headers: {
         'Content-Type': 'image/gif',
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': 'public, max-age=0, must-revalidate',
         'Content-Length': gifBuffer.length.toString(),
       },
     });

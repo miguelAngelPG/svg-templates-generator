@@ -1,14 +1,7 @@
 import { NextRequest } from 'next/server';
 import satori from 'satori';
 
-async function getFont() {
-  // Usamos Noto Sans de Google Fonts que sí funciona con Satori
-  const fontData = await fetch(
-    'https://fonts.gstatic.com/s/notosans/v30/o-0IIpQlx3QUlC5A4PNb4g.ttf'
-  ).then((res) => res.arrayBuffer());
-
-  return fontData;
-}
+import { getFonts } from '@/services/fonts';
 
 export async function GET(request: NextRequest) {
   try {
@@ -79,16 +72,16 @@ export async function GET(request: NextRequest) {
       </div>
     );
 
-    const fontData = await getFont();
+    const fonts = await getFonts();
 
-    // Convertir JSX a SVG usando Satori SIN fuentes (usa fonts del sistema)
+    // Convertir JSX a SVG usando Satori
     const svg = await satori(jsx, {
       width,
       height,
       fonts: [
         {
-          name: 'Noto Sans',
-          data: fontData,
+          name: 'Inter',
+          data: fonts.interRegular,
           weight: 400,
           style: 'normal',
         },
@@ -98,7 +91,7 @@ export async function GET(request: NextRequest) {
     return new Response(svg, {
       headers: {
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'public, max-age=0, must-revalidate',
       },
     });
 

@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     const svg = renderComponentToSvg(componentJsx);
 
     return new Response(svg, {
-      headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=3600' },
+      headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=0, must-revalidate' },
     });
 
   } catch (error) {

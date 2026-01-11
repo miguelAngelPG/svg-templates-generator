@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import satori from 'satori';
 import React from 'react';
 import { getTheme } from '@/utils/themes';
+import { getFonts } from '@/services/fonts';
 
 export async function GET(request: NextRequest) {
     try {
@@ -182,7 +183,9 @@ export async function GET(request: NextRequest) {
             </div>
         );
 
-        console.log('Fetching fonts...');
+        const fonts = await getFonts();
+        console.log('Fetching fonts... (cached)');
+
         // Convertir a SVG
         const svg = await satori(jsx, {
             width,
@@ -190,19 +193,19 @@ export async function GET(request: NextRequest) {
             fonts: [
                 {
                     name: 'Inter',
-                    data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-400-normal.woff').then(res => res.arrayBuffer()),
+                    data: fonts.interRegular,
                     weight: 400,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-600-normal.woff').then(res => res.arrayBuffer()),
+                    data: fonts.interSemiBold,
                     weight: 600,
                     style: 'normal',
                 },
                 {
                     name: 'Inter',
-                    data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-700-normal.woff').then(res => res.arrayBuffer()),
+                    data: fonts.interSemiBold, // Reuse 600 for 700 request
                     weight: 700,
                     style: 'normal',
                 },
@@ -213,7 +216,7 @@ export async function GET(request: NextRequest) {
         return new Response(svg, {
             headers: {
                 'Content-Type': 'image/svg+xml',
-                'Cache-Control': 'public, max-age=3600',
+                'Cache-Control': 'public, max-age=0, must-revalidate',
             },
         });
 

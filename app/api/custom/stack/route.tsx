@@ -51,10 +51,11 @@ export async function GET(request: NextRequest) {
         );
 
         // Fonts (Standard set)
+        const fontsData = await getFonts();
         const fonts = [
             {
                 name: 'Inter',
-                data: await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-400-normal.woff').then(res => res.arrayBuffer()),
+                data: fontsData.interRegular,
                 weight: 400 as const,
                 style: 'normal' as const,
             }
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
         return new Response(svg, {
             headers: {
                 'Content-Type': 'image/svg+xml',
-                'Cache-Control': 'public, max-age=3600',
+                'Cache-Control': 'public, max-age=0, must-revalidate',
             },
         });
 

@@ -1,4 +1,17 @@
+// Simple in-memory cache
+let cachedFonts: {
+    outfitRegular: ArrayBuffer;
+    outfitBold: ArrayBuffer;
+    interBold: ArrayBuffer;
+    spaceMono: ArrayBuffer;
+    notoEmoji: ArrayBuffer;
+} | null = null;
+
 export async function getFonts() {
+    if (cachedFonts) {
+        return cachedFonts;
+    }
+
     const [outfitRegular, outfitBold, interBold, spaceMono, notoEmoji] = await Promise.all([
         fetch('https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/files/outfit-latin-400-normal.woff').then(res => res.arrayBuffer()),
         fetch('https://cdn.jsdelivr.net/npm/@fontsource/outfit@5.0.13/files/outfit-latin-700-normal.woff').then(res => res.arrayBuffer()),
@@ -7,5 +20,7 @@ export async function getFonts() {
         // Fallback for Emojis (Monochrome/Flat version is lighter and works better with coloring flexibility)
         fetch('https://cdn.jsdelivr.net/npm/@fontsource/noto-emoji@5.0.12/files/noto-emoji-latin-400-normal.woff').then(res => res.arrayBuffer()),
     ]);
-    return { outfitRegular, outfitBold, interBold, spaceMono, notoEmoji };
+
+    cachedFonts = { outfitRegular, outfitBold, interBold, spaceMono, notoEmoji };
+    return cachedFonts;
 }

@@ -3,7 +3,7 @@ import satori from 'satori';
 
 import { getInterFonts } from '@/services/fonts';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {

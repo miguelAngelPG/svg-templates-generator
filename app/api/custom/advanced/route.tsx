@@ -4,7 +4,8 @@ import React from 'react';
 import { getTheme } from '@/utils/themes';
 import { getInterFonts } from '@/services/fonts';
 
-export const runtime = 'edge';
+// Reverting to Node.js for stability while keeping font optimizations
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
     try {

@@ -256,6 +256,7 @@ Recuerda encodear:
 
 PRs bienvenidos! Abre un issue primero para discutir cambios.
 
+https://svg-templates-generator.vercel.app/api/custom/advanced?content=Building+the+future+with+Next.js&title=Project+Update&subtitle=Q1+2026+Roadmap&width=800&height=400&theme=dark&layout=center&t=1767925508637
 ---
 
 Made with ❤️ by Miguel Angel Pacheco

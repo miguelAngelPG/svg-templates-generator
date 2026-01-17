@@ -4,7 +4,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Label } from '../atoms/Label';
 import { Select } from '../atoms/Select';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams, StatsParams } from '@/hooks/useTemplateGenerator';
 import { ConfigField } from '../molecules/ConfigField';
 import { TemplateSelector } from '../molecules/TemplateSelector';
 import { ThemeGallery } from '../molecules/ThemeGallery';
@@ -33,6 +33,9 @@ interface TemplateSidebarProps {
     retroParams: RetroParams;
     setRetroParams: (val: RetroParams) => void;
 
+    statsParams: StatsParams;
+    setStatsParams: (val: StatsParams) => void;
+
     activeField: string | null;
     setActiveField: (field: string | null) => void;
 }
@@ -45,6 +48,7 @@ export function TemplateSidebar({
     stackParams, setStackParams,
     socialParams, setSocialParams,
     retroParams, setRetroParams,
+    statsParams, setStatsParams,
     activeField, setActiveField
 }: TemplateSidebarProps) {
 
@@ -101,7 +105,8 @@ export function TemplateSidebar({
         checkCustom(ultraParams.theme);
         checkCustom(stackParams.theme);
         checkCustom(socialParams.theme);
-    }, [retroParams.theme, advancedParams.theme, heroParams.theme, ultraParams.theme, stackParams.theme, socialParams.theme]);
+        checkCustom(statsParams.theme);
+    }, [retroParams.theme, advancedParams.theme, heroParams.theme, ultraParams.theme, stackParams.theme, socialParams.theme, statsParams.theme]);
 
     // Helper removed (using ThemeGallery now)
 
@@ -964,6 +969,111 @@ export function TemplateSidebar({
                                         <Input
                                             value={retroParams.customColor2}
                                             onChange={(e) => setRetroParams({ ...retroParams, customColor2: e.target.value })}
+                                            className="font-mono text-xs w-20"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+
+                {selectedTemplate === 'stats' && (
+                    <>
+                        <div className="bg-[#111] p-3 rounded border border-gray-800 mb-2">
+                            <Label>Layout Style</Label>
+                            <Select
+                                value={statsParams.style}
+                                onChange={(e) => setStatsParams({ ...statsParams, style: e.target.value as any })}
+                                fullWidth
+                                className="mt-1"
+                            >
+                                <option value="dashboard">Dashboard (Full)</option>
+                                <option value="card">Card (Vertical)</option>
+                                <option value="compact">Compact (Row)</option>
+                            </Select>
+                        </div>
+
+                        <ConfigField
+                            label="Title"
+                            value={statsParams.title}
+                            onChange={v => setStatsParams({ ...statsParams, title: v })}
+                        />
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <ConfigField
+                                label="Stars"
+                                value={statsParams.stars}
+                                onChange={v => setStatsParams({ ...statsParams, stars: v })}
+                            />
+                            <ConfigField
+                                label="Commits"
+                                value={statsParams.commits}
+                                onChange={v => setStatsParams({ ...statsParams, commits: v })}
+                            />
+                            <ConfigField
+                                label="PRs"
+                                value={statsParams.prs}
+                                onChange={v => setStatsParams({ ...statsParams, prs: v })}
+                            />
+                            <ConfigField
+                                label="Issues"
+                                value={statsParams.issues}
+                                onChange={v => setStatsParams({ ...statsParams, issues: v })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <ConfigField
+                                label="Contributions"
+                                value={statsParams.contribs}
+                                onChange={v => setStatsParams({ ...statsParams, contribs: v })}
+                            />
+                            <ConfigField
+                                label="Rank (Optional)"
+                                value={statsParams.rank}
+                                onChange={v => setStatsParams({ ...statsParams, rank: v })}
+                            />
+                        </div>
+
+                        <div className="mt-4 border-t border-gray-800 pt-4">
+                            <ThemeGallery
+                                selectedTheme={statsParams.theme}
+                                onSelect={(t) => setStatsParams({ ...statsParams, theme: t })}
+                            />
+                        </div>
+
+                        {statsParams.theme === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <Label>Primary Color</Label>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="color"
+                                            value={statsParams.customColor}
+                                            onChange={(e) => setStatsParams({ ...statsParams, customColor: e.target.value })}
+                                            className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
+                                        />
+                                        <Input
+                                            value={statsParams.customColor}
+                                            onChange={(e) => setStatsParams({ ...statsParams, customColor: e.target.value })}
+                                            className="font-mono text-xs w-20"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>Secondary Color</Label>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="color"
+                                            value={statsParams.customColor2}
+                                            onChange={(e) => setStatsParams({ ...statsParams, customColor2: e.target.value })}
+                                            className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
+                                        />
+                                        <Input
+                                            value={statsParams.customColor2}
+                                            onChange={(e) => setStatsParams({ ...statsParams, customColor2: e.target.value })}
                                             className="font-mono text-xs w-20"
                                         />
                                     </div>

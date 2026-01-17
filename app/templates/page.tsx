@@ -19,6 +19,7 @@ export default function TemplatesPage() {
         stackParams, setStackParams,
         socialParams, setSocialParams,
         retroParams, setRetroParams,
+        statsParams, setStatsParams,
         activeField, setActiveField
     } = useTemplateGenerator();
 
@@ -46,6 +47,8 @@ export default function TemplatesPage() {
                 setSocialParams={setSocialParams}
                 retroParams={retroParams}
                 setRetroParams={setRetroParams}
+                statsParams={statsParams}
+                setStatsParams={setStatsParams}
 
                 activeField={activeField}
                 setActiveField={setActiveField}
@@ -62,6 +65,7 @@ export default function TemplatesPage() {
                 stackParams={stackParams}
                 socialParams={socialParams}
                 retroParams={retroParams}
+                statsParams={statsParams}
                 activeField={activeField}
                 setActiveField={setActiveField}
             />

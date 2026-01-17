@@ -16,6 +16,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
     { id: 'stack', label: 'Tech Stack', icon: Layers, color: 'text-purple-400' },
     { id: 'social', label: 'Social Hub', icon: Share2, color: 'text-pink-400' },
     { id: 'advanced', label: 'Marketing Card', icon: LayoutTemplate, color: 'text-cyan-400' },
+    { id: 'stats', label: 'GitHub Stats', icon: User, color: 'text-emerald-400' },
 ];
 
 interface TemplateSelectorProps {

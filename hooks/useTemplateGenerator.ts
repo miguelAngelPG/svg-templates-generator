@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'retro';
+export type TemplateType = 'advanced' | 'hero' | 'ultra' | 'stack' | 'social' | 'retro' | 'stats';
 
 export interface AdvancedParams {
     content: string;
@@ -76,6 +76,20 @@ export interface RetroParams {
     txt_1: string; // Player Name / Title
     txt_2: string; // Level / Description
     img_1: string; // Avatar URL
+    theme: string;
+    customColor: string;
+    customColor2: string;
+}
+
+export interface StatsParams {
+    style: 'compact' | 'card' | 'dashboard';
+    title: string;
+    commits: string;
+    prs: string;
+    issues: string;
+    stars: string;
+    contribs: string;
+    rank: string;
     theme: string;
     customColor: string;
     customColor2: string;
@@ -161,6 +175,20 @@ export function useTemplateGenerator() {
         img_1: '', // Optional avatar
         theme: 'custom',
         customColor: '#8b8b8b', // Default GB grey/green
+        customColor2: '#ffffff'
+    });
+
+    const [statsParams, setStatsParams] = useState<StatsParams>({
+        style: 'dashboard',
+        title: 'GitHub Stats',
+        commits: '1,234',
+        prs: '56',
+        issues: '23',
+        stars: '150',
+        contribs: '800',
+        rank: 'A+',
+        theme: 'dark',
+        customColor: '#8855ff',
         customColor2: '#ffffff'
     });
 
@@ -320,6 +348,24 @@ export function useTemplateGenerator() {
                     p.append('customColor2', c2);
                 }
                 url = `/api/templates/retro?${p.toString()}&t=${Date.now()}`;
+            } else if (selectedTemplate === 'stats') {
+                const p = new URLSearchParams();
+                p.append('style', statsParams.style);
+                p.append('title', statsParams.title);
+                p.append('commits', statsParams.commits);
+                p.append('prs', statsParams.prs);
+                p.append('issues', statsParams.issues);
+                p.append('stars', statsParams.stars);
+                p.append('contribs', statsParams.contribs);
+                p.append('rank', statsParams.rank);
+                p.append('theme', statsParams.theme);
+
+                if (statsParams.theme === 'custom') {
+                    p.append('customColor', statsParams.customColor || '#8855ff');
+                    const c2 = statsParams.customColor2 || '#ffffff';
+                    p.append('customColor2', c2);
+                }
+                url = `/api/custom/stats?${p.toString()}&t=${Date.now()}`;
             }
 
             setGeneratedUrl(url);
@@ -327,7 +373,7 @@ export function useTemplateGenerator() {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, retroParams]);
+    }, [selectedTemplate, advancedParams, heroParams, ultraParams, stackParams, socialParams, retroParams, statsParams]);
 
     return {
         selectedTemplate,
@@ -340,6 +386,7 @@ export function useTemplateGenerator() {
         stackParams, setStackParams,
         socialParams, setSocialParams,
         retroParams, setRetroParams,
+        statsParams, setStatsParams,
         activeField, setActiveField
     };
 }

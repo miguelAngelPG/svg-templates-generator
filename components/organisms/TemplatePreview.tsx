@@ -23,7 +23,8 @@ import { getTheme } from '@/utils/themes';
 import { fetchSocialIcons, SocialPlatform } from '@/utils/social-icons';
 import { SocialTemplate } from '../templates/social/SocialTemplate';
 import { RetroTemplate } from '../templates/retro/RetroTemplate';
-import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams } from '@/hooks/useTemplateGenerator';
+import { TemplateType, AdvancedParams, HeroParams, UltraParams, StackParams, SocialParams, RetroParams, StatsParams } from '@/hooks/useTemplateGenerator';
+import { StatsTemplate } from '../templates/stats/StatsTemplate';
 
 interface TemplatePreviewProps {
     generatedUrl: string;
@@ -37,6 +38,7 @@ interface TemplatePreviewProps {
     stackParams: StackParams;
     socialParams: SocialParams;
     retroParams: RetroParams;
+    statsParams: StatsParams;
     activeField: string | null;
     setActiveField: (field: string | null) => void;
 }
@@ -51,6 +53,7 @@ export function TemplatePreview({
     stackParams,
     socialParams,
     retroParams,
+    statsParams,
     activeField,
     setActiveField
 }: TemplatePreviewProps) {
@@ -301,12 +304,44 @@ export function TemplatePreview({
                 </div>
             );
         }
+        else if (templateName === 'stats') {
+            const theme = getTheme(statsParams.theme, statsParams.customColor, statsParams.customColor2);
+
+            if (statsParams.style === 'compact') {
+                width = 450;
+                height = 60;
+            } else if (statsParams.style === 'card') {
+                width = 300;
+                height = 350;
+            } else {
+                width = 500;
+                height = 300;
+            }
+
+            component = (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <StatsTemplate
+                        data={{
+                            commits: statsParams.commits,
+                            prs: statsParams.prs,
+                            issues: statsParams.issues,
+                            stars: statsParams.stars,
+                            contribs: statsParams.contribs,
+                            rank: statsParams.rank
+                        }}
+                        style={statsParams.style}
+                        title={statsParams.title}
+                        theme={theme}
+                    />
+                </div>
+            );
+        }
 
 
 
         return { component, width, height };
 
-    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, generatedUrl, isLoading]);
+    }, [templateName, advancedParams, heroParams, ultraParams, stackParams, socialParams, generatedUrl, isLoading, statsParams, retroParams]);
 
     return (
         <div className="flex flex-col gap-6 h-full">
